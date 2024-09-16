@@ -1,0 +1,14 @@
+.login-background {
+    background: rgba(134, 110, 66, 1.0);
+    background: radial-gradient(at center, rgba(134, 110, 66, 1.0), rgba(149, 95, 95, 1.0));
+    height: 100vh; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  form input::placeholder {
+    color: rgba(0, 0, 0, 0.5); 
+    font-weight: bold; 
+    font-size: 1.1rem; 
+  }
