@@ -1,7 +1,6 @@
 // src/BlogPage.js
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Analytics } from "@vercel/analytics/react"
 
 
 function Home() {

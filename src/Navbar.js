@@ -24,7 +24,7 @@ function Navbar() {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: '#6F4E37', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} aria-label="Offcanvas navbar large">
+    <nav className="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: '#9c8264', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} aria-label="Offcanvas navbar large">
       <div className="container-fluid">
         <a className="navbar-brand" href="/">
         </a>
