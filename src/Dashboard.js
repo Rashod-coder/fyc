@@ -4,13 +4,14 @@ import { doc, getDoc, collection } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Epartner from './editPartner';
+import VerifyRoleRequest from './Verify'; // Import the new component
+import GuestDashboard from './guestDash';
 
 function Dashboard() {
     const [userName, setUserName] = useState('');
     const [accountLevel, setAccountLevel] = useState('');
     const [loading, setLoading] = useState(true);
     const [greeting, setGreeting] = useState('');
-    const [showActions, setShowActions] = useState(null); // State to control action section visibility
     const navigate = useNavigate();
 
     const getGreeting = () => {
@@ -66,15 +67,28 @@ function Dashboard() {
         <div style={{ padding: '1rem' }}>
             <div style={{ backgroundColor: '#FAF3E0', borderRadius: '12px', padding: '2rem', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}>
                 <h1 style={{ color: '#6B4226', fontSize: '2rem' }}>{greeting}, {userName}!</h1>
-                <button className="btn btn-dark mt-4" style={{ padding: '0.75rem 1.5rem', fontSize: '1rem' }}>
+                <button className="btn btn-dark mt-4 btn-sm" style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}>
                     Edit Account Settings
-                </button>            
-                
-                </div>
+                </button>     
+            </div>
 
             {accountLevel === 'admin' && (
                 <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#F9F9F9', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}>
                     <Epartner />
+                </div>
+            )}
+
+            {accountLevel === 'guest' && (
+                
+                <div style={{ marginTop: '2rem' }}>
+
+                    
+                    
+                    <div className='mt-3'>
+                    <VerifyRoleRequest />
+
+                    </div>
+                    <GuestDashboard/>
                 </div>
             )}
         </div>
