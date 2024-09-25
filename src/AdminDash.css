@@ -1,0 +1,88 @@
+/* Admin Dashboard Styling */
+.admin-container {
+    padding: 40px;
+    max-width: 1200px;
+    margin: auto;
+  }
+  
+  .admin-title {
+    text-align: center;
+    font-size: 36px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 30px;
+  }
+  
+  .section-title {
+    font-size: 28px;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    color: #444;
+    font-weight: bold;
+  }
+  
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #f9f9f9;
+  }
+  
+  .admin-table thead {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .admin-table th,
+  .admin-table td {
+    padding: 15px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+  
+  .admin-table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  .admin-table tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .status {
+    font-weight: bold;
+  }
+  
+  .status.approved {
+    color: green;
+  }
+  
+  .status.rejected {
+    color: red;
+  }
+  
+  .approve-btn,
+  .reject-btn {
+    padding: 10px 15px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-right: 10px;
+  }
+  
+  .approve-btn {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .approve-btn:hover {
+    background-color: #218838;
+  }
+  
+  .reject-btn {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .reject-btn:hover {
+    background-color: #c82333;
+  }

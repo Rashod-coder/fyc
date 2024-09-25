@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Epartner from './editPartner';
 import VerifyRoleRequest from './Verify'; // Import the new component
 import GuestDashboard from './guestDash';
+import AdminDash from './adminDash';
 
 function Dashboard() {
     const [userName, setUserName] = useState('');
@@ -75,6 +76,7 @@ function Dashboard() {
             {accountLevel === 'admin' && (
                 <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#F9F9F9', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}>
                     <Epartner />
+                    <AdminDash/>
                 </div>
             )}
 
