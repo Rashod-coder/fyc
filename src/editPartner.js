@@ -62,33 +62,29 @@ function EditPartnerPage() {
             await addDoc(partnersCollection, partnerData);
             console.log('Partner info uploaded successfully');
 
-            // Show success alert
             alert('Upload successful!');
 
-            // Reset form fields after successful submission
             setTitle('');
             setWebsiteLink('');
             setEditorContent('');
-            setFile(null); // Clear the file input
+            setFile(null); 
 
-            // Clear the file input in the form
-            document.getElementById('fileUpload').value = ''; // Reset the input field
+            document.getElementById('fileUpload').value = ''; 
         } catch (error) {
             console.error('Error uploading partner info:', error);
         } finally {
-            setLoading(false); // Stop loading
+            setLoading(false); 
         }
     };
 
     return (
         <div className="container mt-5">
             <div className="card p-4 shadow-sm" style={{ backgroundColor: '#F0F4FF', borderRadius: '12px' }}>
-                <h2 className="mb-4" style={{ color: '#1E3A8A' }}>Add Partner Page</h2>
+                <h2 className="mb-4" style={{ color: 'black' }}>Add Partner Page</h2>
 
                 <form onSubmit={handleSubmit}>
-                    {/* Title input */}
                     <div className="form-group mb-4">
-                        <label htmlFor="title" style={{ color: '#1E3A8A' }}>Title</label>
+                        <label htmlFor="title" style={{ color: 'black' }}>Title</label>
                         <input
                             type="text"
                             id="title"
@@ -96,20 +92,20 @@ function EditPartnerPage() {
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             required
-                            style={{ backgroundColor: '#E0E7FF', color: '#1E3A8A', border: '1px solid #1E3A8A' }}
+                            style={{ backgroundColor: 'white', color: 'black', border: '1px solid #1E3A8A' }}
                         />
                     </div>
 
                     {/* Website link input */}
                     <div className="form-group mb-4">
-                        <label htmlFor="websiteLink" style={{ color: '#1E3A8A' }}>Website Link</label>
+                        <label htmlFor="websiteLink" style={{ color: 'black' }}>Website Link</label>
                         <input
                             type="url"
                             id="websiteLink"
                             className="form-control"
                             value={websiteLink}
                             onChange={(e) => setWebsiteLink(e.target.value)}
-                            style={{ backgroundColor: '#E0E7FF', color: '#1E3A8A', border: '1px solid #1E3A8A' }}
+                            style={{ backgroundColor: 'white', color: 'black', border: '1px solid #1E3A8A' }}
                         />
                     </div>
 
@@ -119,7 +115,7 @@ function EditPartnerPage() {
                         <ReactQuill 
                             value={editorContent} 
                             onChange={handleEditorChange} 
-                            style={{ backgroundColor: '#E0E7FF', color: '#1E3A8A', border: '1px solid #1E3A8A' }}
+                            style={{ backgroundColor: 'white', color: '#1E3A8A', maxHeight: '150px', minHeight: '150px' }}
                         />
                     </div>
 

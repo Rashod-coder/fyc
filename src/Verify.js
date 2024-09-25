@@ -8,7 +8,6 @@ function VerifyRoleRequest() {
     const [roleStatus, setRoleStatus] = useState(''); // Track role status from Firebase
     const [loading, setLoading] = useState(false); // Track loading state
 
-    // Fetch user's role status from Firebase
     useEffect(() => {
         const fetchUserRoleStatus = async () => {
             const user = auth.currentUser;
@@ -44,6 +43,7 @@ function VerifyRoleRequest() {
                     roleStatus: 'pending',
                     requestedRole: requestedRole,
                 });
+                console.log("Role requested succesfully")
 
                 setRoleStatus('pending');
             } catch (error) {
@@ -89,7 +89,6 @@ function VerifyRoleRequest() {
                         <option value="" disabled>Select role...</option>
                         <option value="staff">Staff</option>
                         <option value="admin">Admin</option>
-                        <option value="partner">Partner</option>
 
                     </select>
                 </div>
@@ -97,7 +96,6 @@ function VerifyRoleRequest() {
                     {loading ? 'Submitting...' : 'Submit Request'}
                 </button>
 
-                {/* Show loading bar when submitting */}
                 {loading && (
                     <div className="progress mt-3">
                         <div
