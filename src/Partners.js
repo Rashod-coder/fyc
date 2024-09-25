@@ -4,13 +4,13 @@ import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
 import './PartnersPage.css'; // Import CSS for animations
 
-function PartnersPage({ currentUser }) { // Assuming currentUser is passed as a prop
+function PartnersPage({ currentUser }) {
     const [partners, setPartners] = useState([]);
-    const [loading, setLoading] = useState(true); // Add loading state
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchPartners = async () => {
-            setLoading(true); // Set loading to true before fetching
+            setLoading(true);
             try {
                 const partnersCollection = collection(db, 'partner');
                 const partnerSnapshot = await getDocs(partnersCollection);
@@ -22,7 +22,7 @@ function PartnersPage({ currentUser }) { // Assuming currentUser is passed as a 
             } catch (error) {
                 console.error("Error fetching partners:", error);
             } finally {
-                setLoading(false); // Set loading to false after fetching
+                setLoading(false);
             }
         };
 
@@ -33,7 +33,7 @@ function PartnersPage({ currentUser }) { // Assuming currentUser is passed as a 
         if (window.confirm("Are you sure you want to delete this partnership?")) {
             try {
                 await deleteDoc(doc(db, 'partner', partnerId));
-                setPartners(partners.filter(partner => partner.id !== partnerId)); // Update state
+                setPartners(partners.filter(partner => partner.id !== partnerId));
             } catch (error) {
                 console.error("Error deleting partner:", error);
             }
@@ -41,7 +41,7 @@ function PartnersPage({ currentUser }) { // Assuming currentUser is passed as a 
     };
 
     return (
-        <div className="partners-page" style={{ position: 'relative', padding: '30px' }}>
+        <div className="partners-page container my-5">
             {loading && (
                 <div className="loading-overlay d-flex justify-content-center align-items-center">
                     <div className="spinner-border" role="status">
@@ -49,89 +49,67 @@ function PartnersPage({ currentUser }) { // Assuming currentUser is passed as a 
                     </div>
                 </div>
             )}
-            <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', maxWidth: '1200px', margin: '10px auto', padding: '30px' }}>
-                <h1 style={{ textAlign: 'center', color: '#1E3A8A', marginBottom: '40px', fontSize: '2.5em', fontWeight: 'bold' }}>Our Partners</h1>
+            <div className="bg-white rounded shadow p-4">
+                <h1 className="text-center text-primary mb-4">Our Partners</h1>
                 
-                {/* Instructions Section */}
-                <div style={{ marginBottom: '30px', padding: '15px', backgroundColor: '#EAEAEA', borderRadius: '8px', textAlign: 'center' }}>
-                    <h2 style={{ color: '#1E3A8A', fontSize: '1.8em', marginBottom: '10px' }}>Become a Partner</h2>
-                    <p style={{ color: '#4B5563', fontSize: '1.1em' }}>
+                <div className="mb-4 p-3 bg-light rounded text-center">
+                    <h2 className="text-primary">Become a Partner</h2>
+                    <p className="text-secondary">
                         We are always looking to expand our network of partners. If you are interested in collaborating with us, please follow these simple steps:
                     </p>
-                    <ul style={{ listStyleType: 'none', padding: 0, color: '#4B5563', fontSize: '1.1em' }}>
+                    <ul className="list-unstyled text-secondary">
                         <li>1. Create an account and go to Dashboard</li>
                         <li>2. Fill out the partnership application form.</li>
                         <li>3. Provide details about your organization.</li>
                         <li>4. Submit your application for review.</li>
                     </ul>
-                    <p style={{ color: '#4B5563', fontSize: '1.1em' }}>
+                    <p className="text-secondary">
                         We will get back to you shortly!
                     </p>
                 </div>
 
-                {partners.map(partner => (
-                    <div className="card mb-4" key={partner.id} style={{ width: '100%', backgroundColor: '#FFFFFF', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)', padding: '20px', transition: 'transform 0.2s', margin: '0 auto' }}>
-                        <div className="d-flex flex-column flex-md-row align-items-center">
-                            <img 
-                                src={partner.logoURL} 
-                                alt={partner.title} 
-                                style={{ 
-                                    maxWidth: '300px', 
-                                    height: 'auto', 
-                                    borderRadius: '12px', 
-                                    marginRight: '30px', 
-                                    marginBottom: '20px', 
-                                    objectFit: 'contain', 
-                                }} 
-                            />
-                            <div style={{ flex: 1, textAlign: 'left', marginBottom: '20px' }}>
-                                <h2 style={{ color: '#1E3A8A', fontSize: '2em', marginBottom: '10px', fontWeight: 'bold' }}>{partner.title}</h2>
-                                <div style={{ color: '#4B5563', fontSize: '1.2em', marginBottom: '15px' }} dangerouslySetInnerHTML={{ __html: partner.groupDescription }} />
-                                {partner.websiteLink && (
-                                    <a 
-                                        href={partner.websiteLink} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer" 
-                                        style={{ 
-                                            display: 'inline-block', 
-                                            padding: '12px 24px', 
-                                            backgroundColor: '#1E3A8A', 
-                                            color: '#FFFFFF', 
-                                            borderRadius: '5px', 
-                                            textDecoration: 'none', 
-                                            fontSize: '1em', 
-                                            transition: 'background-color 0.2s' 
-                                        }} 
-                                        onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#2563eb'; }}
-                                        onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#1E3A8A'; }}
-                                    >
-                                        Visit Website
-                                    </a>
-                                )}
-                                {currentUser?.isAdmin && ( // Check if the current user is admin
-                                    <button 
-                                        onClick={() => handleDelete(partner.id)} 
-                                        style={{ 
-                                            marginTop: '10px', 
-                                            padding: '10px 20px', 
-                                            backgroundColor: '#dc3545', 
-                                            color: '#ffffff', 
-                                            border: 'none', 
-                                            borderRadius: '5px', 
-                                            cursor: 'pointer',
-                                            fontSize: '1em',
-                                            transition: 'background-color 0.2s',
-                                        }} 
-                                        onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#c82333'; }}
-                                        onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#dc3545'; }}
-                                    >
-                                        Delete Partnership
-                                    </button>
-                                )}
+                <div className="row">
+                    {partners.map(partner => (
+                        <div className="col-lg-4 col-md-6 mb-4" key={partner.id}>
+                            <div className="card h-100 d-flex flex-column">
+                                <img 
+                                    src={partner.logoURL} 
+                                    alt={partner.title} 
+                                    className="card-img-top img-fluid mt-3" 
+                                    style={{ objectFit: 'contain', maxHeight: '200px' }}
+                                />
+                                <div className="card-body flex-grow-1">
+                                    <h5 className="card-title text-primary">{partner.title}</h5>
+                                    <p className="card-text text-secondary" dangerouslySetInnerHTML={{ __html: partner.groupDescription }} />
+                                </div>
+                                <div className="card-footer d-flex justify-content-between align-items-center">
+                                    {partner.websiteLink ? (
+                                        <a 
+                                            href={partner.websiteLink} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer" 
+                                            className="btn btn-primary"
+                                            style={{ flexGrow: 1 }}
+                                        >
+                                            Visit Website
+                                        </a>
+                                    ) : (
+                                        <p className="text-muted mb-0" style={{ flexGrow: 1 }}>Organization website not available</p>
+                                    )}
+                                    {currentUser?.isAdmin && (
+                                        <button 
+                                            onClick={() => handleDelete(partner.id)} 
+                                            className="btn btn-danger"
+                                            style={{ marginLeft: '10px' }}
+                                        >
+                                            Delete
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
         </div>
     );
