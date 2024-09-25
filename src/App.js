@@ -8,6 +8,7 @@ import Register from './Register'
 import Dashboard from './Dashboard';
 import Settings from './Settings';
 import PartnersPage from './Partners';
+import TeamsPage from './Team';
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
        <Route path="dashboard" element={<Dashboard />} />
        <Route path="profile-settings" element={<Settings />} />
        <Route path="partners" element={<PartnersPage />} />
+       <Route path = 'team' element={<TeamsPage/>} />
       </Routes>
    </Router>
   );
