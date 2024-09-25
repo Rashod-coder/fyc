@@ -57,7 +57,6 @@ const AdminDash = () => {
 
   return (
     <div className="container mt-4">
-      <h2 className="text-center mb-4">Admin Dashboard</h2>
 
       {/* Partnership Requests */}
       <div className="mb-5">
