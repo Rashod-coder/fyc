@@ -6,6 +6,7 @@ import Home from './Home'
 import Login from './Login'
 import Register from './Register'
 import Dashboard from './Dashboard';
+import Settings from './Settings';
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
        <Route path="login" element={<Login />} />
        <Route path="register" element={<Register />} />
        <Route path="dashboard" element={<Dashboard />} />
+       <Route path="profile-settings" element={<Settings />} />
       </Routes>
    </Router>
   );

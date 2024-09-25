@@ -4,7 +4,7 @@ import { doc, getDoc, collection } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Epartner from './editPartner';
-import VerifyRoleRequest from './Verify'; // Import the new component
+import VerifyRoleRequest from './Verify';
 import GuestDashboard from './guestDash';
 import AdminDash from './adminDash';
 
@@ -64,33 +64,41 @@ function Dashboard() {
         );
     }
 
+    const handleEditSettings = () => {
+        navigate('/profile-settings');
+    };
+
     return (
-        <div style={{ padding: '1rem' }}>
-            <div style={{ backgroundColor: '#FAF3E0', borderRadius: '12px', padding: '2rem', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}>
-                <h1 style={{ color: '#6B4226', fontSize: '2rem' }}>{greeting}, {userName}!</h1>
-                <button className="btn btn-dark mt-4 btn-sm" style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}>
+<div 
+    style={{ 
+        padding: '2rem', 
+        background: 'linear-gradient(90deg, rgba(216,247,255,1) 0%, rgba(250,220,206,1) 35%, rgba(157,238,255,1) 100%)', 
+        minHeight: '100vh' 
+    }}
+>            <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '2rem', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
+                <h1 style={{ color: '#00796b', fontSize: '2rem' }}>{greeting}, {userName}!</h1>
+                <button
+                    className="btn btn-primary mt-4"
+                    style={{ padding: '0.5rem 1rem', fontSize: '1rem' }}
+                    onClick={handleEditSettings}
+                >
                     Edit Account Settings
-                </button>     
+                </button>
             </div>
 
             {accountLevel === 'admin' && (
-                <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#F9F9F9', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}>
+                <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
                     <Epartner />
-                    <AdminDash/>
+                    <AdminDash />
                 </div>
             )}
 
             {accountLevel === 'guest' && (
-                
                 <div style={{ marginTop: '2rem' }}>
-
-                    
-                    
                     <div className='mt-3'>
-                    <VerifyRoleRequest />
-
+                        <VerifyRoleRequest />
                     </div>
-                    <GuestDashboard/>
+                    <GuestDashboard />
                 </div>
             )}
         </div>

@@ -37,25 +37,17 @@ function EditPartnerPage() {
         console.log('Form Data:', formData);
 
         // You can proceed to save this data to a database or Firestore here
-        // Example: upload form data to a server or Firebase
-        // fetch('your-api-endpoint', {
-        //     method: 'POST',
-        //     body: formData,
-        // })
-        // .then(response => response.json())
-        // .then(data => console.log(data))
-        // .catch(error => console.error(error));
     };
 
     return (
         <div className="container mt-5">
-            <div className="card p-4 shadow-sm" style={{ backgroundColor: '#FAF3E0', borderRadius: '12px' }}>
-                <h2 className="mb-4" style={{ color: '#6B4226' }}>Edit Partner Page</h2>
+            <div className="card p-4 shadow-sm" style={{ backgroundColor: '#F0F4FF', borderRadius: '12px' }}>
+                <h2 className="mb-4" style={{ color: '#1E3A8A' }}>Edit Partner Page</h2>
 
                 <form onSubmit={handleSubmit}>
                     {/* Title input */}
                     <div className="form-group mb-4">
-                        <label htmlFor="title" style={{ color: '#6B4226' }}>Title</label>
+                        <label htmlFor="title" style={{ color: '#1E3A8A' }}>Title</label>
                         <input
                             type="text"
                             id="title"
@@ -63,51 +55,51 @@ function EditPartnerPage() {
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             required
-                            style={{ backgroundColor: '#FFF5E1', color: '#6B4226' }}
+                            style={{ backgroundColor: '#E0E7FF', color: '#1E3A8A', border: '1px solid #1E3A8A' }}
                         />
                     </div>
 
                     {/* Website link input */}
                     <div className="form-group mb-4">
-                        <label htmlFor="websiteLink" style={{ color: '#6B4226' }}>Website Link</label>
+                        <label htmlFor="websiteLink" style={{ color: '#1E3A8A' }}>Website Link</label>
                         <input
                             type="url"
                             id="websiteLink"
                             className="form-control"
                             value={websiteLink}
                             onChange={(e) => setWebsiteLink(e.target.value)}
-                            style={{ backgroundColor: '#FFF5E1', color: '#6B4226' }}
+                            style={{ backgroundColor: '#E0E7FF', color: '#1E3A8A', border: '1px solid #1E3A8A' }}
                         />
                     </div>
 
+                    {/* Group Description (using ReactQuill) */}
                     <div className="form-group mb-4">
-                        <label htmlFor="websiteLink" style={{ color: '#6B4226' }}>Group Description</label>
-                        <input
-                            type="text"
-                            id="description"
-                            className="form-control"
-                            value={editorContent}
-                            onChange={(e) => setEditorContent(e.target.value)}
-                            required
-                            style={{ backgroundColor: '#FFF5E1', color: '#6B4226' }}
+                        <label htmlFor="description" style={{ color: '#1E3A8A' }}>Group Description</label>
+                        <ReactQuill 
+                            value={editorContent} 
+                            onChange={handleEditorChange} 
+                            style={{ backgroundColor: '#E0E7FF', color: '#1E3A8A', border: '1px solid #1E3A8A' }}
                         />
                     </div>
 
                     {/* File input */}
                     <div className="form-group mb-4">
-                        <label htmlFor="fileUpload" style={{ color: '#6B4226' }}>Upload Group Logo</label>
+                        <label htmlFor="fileUpload" style={{ color: '#1E3A8A' }}>Upload Group Logo</label>
                         <input
                             type="file"
                             id="fileUpload"
                             className="form-control"
                             onChange={handleFileChange}
-
-                            style={{ backgroundColor: '#FFF5E1', color: '#6B4226' }}
+                            style={{ backgroundColor: '#E0E7FF', color: '#1E3A8A', border: '1px solid #1E3A8A' }}
                         />
                     </div>
 
                     {/* Submit button */}
-                    <button type="submit" className="btn btn-success" style={{ backgroundColor: '#B5651D', borderColor: '#B5651D' }}>
+                    <button 
+                        type="submit" 
+                        className="btn btn-primary" 
+                        style={{ backgroundColor: '#1E3A8A', borderColor: '#1E3A8A' }}
+                    >
                         Upload Partner Info
                     </button>
                 </form>

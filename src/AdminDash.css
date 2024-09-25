@@ -3,86 +3,114 @@
     padding: 40px;
     max-width: 1200px;
     margin: auto;
-  }
-  
-  .admin-title {
+}
+
+.admin-title {
     text-align: center;
     font-size: 36px;
     font-weight: bold;
     color: #333;
     margin-bottom: 30px;
-  }
-  
-  .section-title {
+}
+
+.section-title {
     font-size: 28px;
     margin-top: 40px;
     margin-bottom: 20px;
     color: #444;
     font-weight: bold;
-  }
-  
-  .admin-table {
+}
+
+/* Modern Table Styles */
+.admin-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #f9f9f9;
-  }
-  
-  .admin-table thead {
+    background: linear-gradient(to bottom right, #ffffff, #f9f9f9); /* Gradient background */
+    border-radius: 12px; /* Rounded corners */
+    overflow: hidden; /* Ensure corners are rounded */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Deeper shadow for more depth */
+    margin-top: 20px; /* Add spacing between sections */
+    animation: fadeIn 0.5s ease-in; /* Fade-in animation */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.admin-table thead {
     background-color: #007bff;
     color: white;
-  }
-  
-  .admin-table th,
-  .admin-table td {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow for header */
+}
+
+.admin-table th,
+.admin-table td {
     padding: 15px;
     text-align: left;
-    border: 1px solid #ddd;
-  }
-  
-  .admin-table tbody tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-  
-  .admin-table tbody tr:hover {
-    background-color: #f1f1f1;
-  }
-  
-  .status {
+    border: none; /* Remove borders for a cleaner look */
+    transition: background-color 0.3s, transform 0.2s; /* Smooth transition for hover effects */
+}
+
+.admin-table tbody tr {
+    transition: background-color 0.3s, transform 0.2s; /* Smooth transition for hover effects */
+}
+
+.admin-table tbody tr:nth-child(even) {
+    background-color: #f2f2f2; /* Light background for even rows */
+}
+
+.admin-table tbody tr:hover {
+    background-color: #e8f0fe; /* Soft hover effect with blue tint */
+    transform: translateY(-2px); /* Slight lift on hover */
+}
+
+/* Status Styles */
+.status {
     font-weight: bold;
-  }
-  
-  .status.approved {
-    color: green;
-  }
-  
-  .status.rejected {
-    color: red;
-  }
-  
-  .approve-btn,
-  .reject-btn {
+    transition: color 0.3s; /* Smooth color transition */
+}
+
+.status.approved {
+    color: #28a745;
+}
+
+.status.rejected {
+    color: #dc3545;
+}
+
+/* Button Styles */
+.approve-btn,
+.reject-btn {
     padding: 10px 15px;
     border: none;
     font-size: 14px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.2s; /* Button hover effect */
     margin-right: 10px;
-  }
-  
-  .approve-btn {
+    border-radius: 5px; /* Rounded buttons */
+}
+
+.approve-btn {
     background-color: #28a745;
     color: white;
-  }
-  
-  .approve-btn:hover {
+}
+
+.approve-btn:hover {
     background-color: #218838;
-  }
-  
-  .reject-btn {
+    transform: scale(1.05); /* Slight grow on hover */
+}
+
+.reject-btn {
     background-color: #dc3545;
     color: white;
-  }
-  
-  .reject-btn:hover {
+}
+
+.reject-btn:hover {
     background-color: #c82333;
-  }
+    transform: scale(1.05); /* Slight grow on hover */
+}
