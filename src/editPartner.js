@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Import Quill stylesheet
+import { storage, db } from './Firebase/Firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, addDoc } from 'firebase/firestore';
 
 function EditPartnerPage() {
     const [editorContent, setEditorContent] = useState('');
     const [title, setTitle] = useState('');
     const [websiteLink, setWebsiteLink] = useState('');
-    const [files, setFiles] = useState([]);
+    const [file, setFile] = useState(null);
+    const [loading, setLoading] = useState(false); // State to manage loading status
 
     // Handle editor content change
     const handleEditorChange = (value) => {
@@ -15,34 +19,71 @@ function EditPartnerPage() {
 
     // Handle file input change
     const handleFileChange = (e) => {
-        setFiles(e.target.files);
+        const selectedFile = e.target.files[0];
+        if (selectedFile && selectedFile.type.startsWith('image/')) {
+            setFile(selectedFile);
+        } else {
+            alert('Please upload a valid image file.');
+            setFile(null); // Reset if the file is not an image
+        }
     };
 
     // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Prepare the form data
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('content', editorContent);
-        formData.append('websiteLink', websiteLink);
+        // Check if a file is selected
+        if (!file) {
+            alert('Please select an image to upload.');
+            return;
+        }
 
-        // Append files to form data
-        Array.from(files).forEach((file, index) => {
-            formData.append(`file${index}`, file);
-        });
+        setLoading(true); // Start loading
 
-        // Log the data to the console (for demonstration purposes)
-        console.log('Form Data:', formData);
+        try {
+            // Upload the image to Firebase Storage
+            const storageRef = ref(storage, `logos/${file.name}`);
+            await uploadBytes(storageRef, file);
+            console.log('File uploaded successfully');
 
-        // You can proceed to save this data to a database or Firestore here
+            // Get the download URL
+            const downloadURL = await getDownloadURL(storageRef);
+
+            // Prepare the partner data to store in Firestore
+            const partnerData = {
+                title,
+                websiteLink,
+                groupDescription: editorContent,
+                logoURL: downloadURL // Store the download link of the logo
+            };
+
+            // Add the partner data to Firestore
+            const partnersCollection = collection(db, 'partner');
+            await addDoc(partnersCollection, partnerData);
+            console.log('Partner info uploaded successfully');
+
+            // Show success alert
+            alert('Upload successful!');
+
+            // Reset form fields after successful submission
+            setTitle('');
+            setWebsiteLink('');
+            setEditorContent('');
+            setFile(null); // Clear the file input
+
+            // Clear the file input in the form
+            document.getElementById('fileUpload').value = ''; // Reset the input field
+        } catch (error) {
+            console.error('Error uploading partner info:', error);
+        } finally {
+            setLoading(false); // Stop loading
+        }
     };
 
     return (
         <div className="container mt-5">
             <div className="card p-4 shadow-sm" style={{ backgroundColor: '#F0F4FF', borderRadius: '12px' }}>
-                <h2 className="mb-4" style={{ color: '#1E3A8A' }}>Edit Partner Page</h2>
+                <h2 className="mb-4" style={{ color: '#1E3A8A' }}>Add Partner Page</h2>
 
                 <form onSubmit={handleSubmit}>
                     {/* Title input */}
@@ -90,6 +131,7 @@ function EditPartnerPage() {
                             id="fileUpload"
                             className="form-control"
                             onChange={handleFileChange}
+                            accept="image/*" // Only allow image files
                             style={{ backgroundColor: '#E0E7FF', color: '#1E3A8A', border: '1px solid #1E3A8A' }}
                         />
                     </div>
@@ -99,10 +141,18 @@ function EditPartnerPage() {
                         type="submit" 
                         className="btn btn-primary" 
                         style={{ backgroundColor: '#1E3A8A', borderColor: '#1E3A8A' }}
+                        disabled={loading} // Disable button during loading
                     >
-                        Upload Partner Info
+                        {loading ? 'Uploading...' : 'Upload Partner Info'}
                     </button>
                 </form>
+
+                {/* Optional loading spinner or message */}
+                {loading && (
+                    <div className="mt-3" style={{ color: '#1E3A8A' }}>
+                        <p>Uploading your information, please wait...</p>
+                    </div>
+                )}
             </div>
         </div>
     );

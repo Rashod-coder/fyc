@@ -57,48 +57,51 @@ const AdminDash = () => {
 
   return (
     <div className="container mt-4">
-
       {/* Partnership Requests */}
       <div className="mb-5">
         <h3 className="mb-3">Partnership Requests</h3>
         <div className="table-responsive">
-          <table className="table table-bordered table-hover">
-            <thead className="table-dark">
-              <tr>
-                <th>Partner Name</th>
-                <th>Best Contact</th>
-                <th>Partner Description</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {partnerRequests.map((request) => (
-                <tr key={request.id}>
-                  <td>{request.partnerName}</td>
-                  <td>{request.bestContact}</td>
-                  <td>{request.partnerDescription}</td>
-                  <td>{request.status}</td>
-                  <td>
-                    <div className="d-grid gap-2 d-md-flex justify-content-md-center">
-                      <button
-                        className="btn btn-success me-md-2 mb-2"
-                        onClick={() => handlePartnerAction(request.id, 'approve')}
-                      >
-                        Approve
-                      </button>
-                      <button
-                        className="btn btn-danger mb-2"
-                        onClick={() => handlePartnerAction(request.id, 'reject')}
-                      >
-                        Reject
-                      </button>
-                    </div>
-                  </td>
+          {partnerRequests.length === 0 ? (
+            <p>No Incoming Requests</p>
+          ) : (
+            <table className="table table-bordered table-hover">
+              <thead className="table-dark">
+                <tr>
+                  <th>Partner Name</th>
+                  <th>Best Contact</th>
+                  <th>Partner Description</th>
+                  <th>Status</th>
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {partnerRequests.map((request) => (
+                  <tr key={request.id}>
+                    <td>{request.partnerName}</td>
+                    <td>{request.bestContact}</td>
+                    <td>{request.partnerDescription}</td>
+                    <td>{request.status}</td>
+                    <td>
+                      <div className="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <button
+                          className="btn btn-success me-md-2 mb-2"
+                          onClick={() => handlePartnerAction(request.id, 'approve')}
+                        >
+                          Approve
+                        </button>
+                        <button
+                          className="btn btn-danger mb-2"
+                          onClick={() => handlePartnerAction(request.id, 'reject')}
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
@@ -138,43 +141,47 @@ const AdminDash = () => {
       <div className="mb-5">
         <h3 className="mb-3">Team Verification Requests</h3>
         <div className="table-responsive">
-          <table className="table table-bordered table-hover">
-            <thead className="table-dark">
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Requested Role</th>
-                <th>Current Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {roleRequests.map((user) => (
-                <tr key={user.id}>
-                  <td>{user.firstName} {user.lastName}</td>
-                  <td>{user.email}</td>
-                  <td>{user.requestedRole}</td>
-                  <td>{user.roleStatus}</td>
-                  <td>
-                    <div className="d-grid gap-2 d-md-flex justify-content-md-center">
-                      <button
-                        className="btn btn-success me-md-2 mb-2"
-                        onClick={() => handleRoleAction(user.id, 'approve', user.requestedRole)}
-                      >
-                        Approve
-                      </button>
-                      <button
-                        className="btn btn-danger mb-2"
-                        onClick={() => handleRoleAction(user.id, 'reject', user.requestedRole)}
-                      >
-                        Reject
-                      </button>
-                    </div>
-                  </td>
+          {roleRequests.length === 0 ? (
+            <p>No Incoming Requests</p>
+          ) : (
+            <table className="table table-bordered table-hover">
+              <thead className="table-dark">
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Requested Role</th>
+                  <th>Current Status</th>
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {roleRequests.map((user) => (
+                  <tr key={user.id}>
+                    <td>{user.firstName} {user.lastName}</td>
+                    <td>{user.email}</td>
+                    <td>{user.requestedRole}</td>
+                    <td>{user.roleStatus}</td>
+                    <td>
+                      <div className="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <button
+                          className="btn btn-success me-md-2 mb-2"
+                          onClick={() => handleRoleAction(user.id, 'approve', user.requestedRole)}
+                        >
+                          Approve
+                        </button>
+                        <button
+                          className="btn btn-danger mb-2"
+                          onClick={() => handleRoleAction(user.id, 'reject', user.requestedRole)}
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 

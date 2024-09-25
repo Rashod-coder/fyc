@@ -1,0 +1,60 @@
+/* PartnersPage.css */
+.partners-container {
+    padding: 20px;
+    background-color: #F0F4FF;
+    border-radius: 12px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.partners-heading {
+    text-align: center;
+    color: #1E3A8A;
+    margin-bottom: 30px;
+}
+
+.partners-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.partner-card {
+    background-color: #FFFFFF;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+}
+
+.partner-logo {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+.partner-title {
+    color: #1E3A8A;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.partner-description {
+    color: #4B5563;
+    font-size: 1em;
+    margin-bottom: 15px;
+}
+
+.partner-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #1E3A8A;
+    color: #FFFFFF;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.partner-link:hover {
+    background-color: #334155;
+}
