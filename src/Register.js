@@ -180,8 +180,7 @@ function Register() {
                 Register
               </button>
             </div>
-            <p>If you're a team member creating an account you will have to be manually approved to a higher account level by admin</p>
-            <div className="text-center">
+                  <div className="text-center">
               <a className="text-muted" href="/login">
                 Already have an account? Log in here
               </a>

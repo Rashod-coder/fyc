@@ -7,10 +7,13 @@ import Epartner from './editPartner';
 import VerifyRoleRequest from './Verify';
 import GuestDashboard from './guestDash';
 import AdminDash from './adminDash';
+import { Box, Typography, Button, CircularProgress, Avatar, Card, Grid } from '@mui/material';
+import { AccountCircle, Star } from '@mui/icons-material';
 
 function Dashboard() {
     const [userName, setUserName] = useState('');
     const [accountLevel, setAccountLevel] = useState('');
+    const [profilePicUrl, setProfilePicUrl] = useState('');
     const [loading, setLoading] = useState(true);
     const [greeting, setGreeting] = useState('');
     const navigate = useNavigate();
@@ -36,9 +39,10 @@ function Dashboard() {
                     const userSnapshot = await getDoc(userDocRef);
 
                     if (userSnapshot.exists()) {
-                        const { firstName, lastName, accountLevel } = userSnapshot.data();
+                        const { firstName, lastName, accountLevel, profilePicUrl } = userSnapshot.data();
                         setUserName(`${firstName} ${lastName}`);
                         setAccountLevel(accountLevel);
+                        setProfilePicUrl(profilePicUrl);
                     }
                 } catch (error) {
                     console.error('Error fetching user data:', error);
@@ -56,11 +60,9 @@ function Dashboard() {
 
     if (loading) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </div>
-            </div>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <CircularProgress />
+            </Box>
         );
     }
 
@@ -69,39 +71,63 @@ function Dashboard() {
     };
 
     return (
-<div 
-    style={{ 
-        padding: '2rem', 
-        background: 'linear-gradient(90deg, rgba(216,247,255,1) 0%, rgba(250,220,206,1) 35%, rgba(157,238,255,1) 100%)', 
-        minHeight: '100vh' 
-    }}
->            <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '2rem', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
-                <h1 style={{ color: '#00796b', fontSize: '2rem' }}>{greeting}, {userName}!</h1>
-                <button
-                    className="btn btn-primary mt-4"
-                    style={{ padding: '0.5rem 1rem', fontSize: '1rem' }}
+        <Box 
+            sx={{ 
+                padding: '2rem', 
+                background: 'linear-gradient(90deg, rgba(16,31,51,1) 0%, rgba(212,213,255,1) 52%, rgba(253,253,255,1) 95%, rgba(255,255,255,1) 100%)',
+                minHeight: '100vh' 
+            }}
+        >
+            <Card sx={{ padding: '2rem', backgroundColor: '#ffffff', borderRadius: '12px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
+                <Grid container alignItems="center">
+                    <Grid item>
+                        <Avatar src={profilePicUrl} alt={userName} sx={{ width: 60, height: 60, marginRight: 2 }} />
+                    </Grid>
+                    <Grid item xs>
+                        <Typography variant="h4" sx={{ color: '#00796b', fontWeight: 'bold' }}>
+                            {greeting}, {userName}!
+                        </Typography>
+                        <Typography variant="body1" sx={{ color: '#555', display: 'flex', alignItems: 'center' }}>
+                            <AccountCircle sx={{ marginRight: 1 }} />
+                            Account Level: 
+                            <strong style={{ color: accountLevel === 'admin' ? '#f39c12' : '#3498db', marginLeft: '0.5rem' }}> 
+                                {accountLevel} 
+                            </strong>
+                        </Typography>
+                    </Grid>
+                </Grid>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ marginTop: '1rem' }}
                     onClick={handleEditSettings}
                 >
                     Edit Account Settings
-                </button>
-            </div>
+                </Button>
+            </Card>
 
             {accountLevel === 'admin' && (
-                <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
-                    <Epartner />
-                    <AdminDash />
-                </div>
+                <Box sx={{ marginTop: '2rem' }}>
+                    <Card sx={{ padding: '1.5rem', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
+                        <Epartner />
+                    </Card>
+                    <Card sx={{ padding: '1.5rem', marginTop: '1rem', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
+                        <AdminDash />
+                    </Card>
+                </Box>
             )}
 
             {accountLevel === 'guest' && (
-                <div style={{ marginTop: '2rem' }}>
-                    <div className='mt-3'>
+                <Box sx={{ marginTop: '2rem' }}>
+                    <Card sx={{ padding: '1.5rem', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
                         <VerifyRoleRequest />
-                    </div>
-                    <GuestDashboard />
-                </div>
+                    </Card>
+                    <Card sx={{ padding: '1.5rem', marginTop: '1rem', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
+                        <GuestDashboard />
+                    </Card>
+                </Box>
             )}
-        </div>
+        </Box>
     );
 }
 

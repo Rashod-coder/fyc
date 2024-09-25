@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { auth, db } from './Firebase/Firebase';
 import { collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { Box, Card, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, LinearProgress, Grid, Button, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Delete, Check, Clear } from '@mui/icons-material';
+import { db } from './Firebase/Firebase';
 
 const AdminDash = () => {
   const [partnerRequests, setPartnerRequests] = useState([]);
   const [roleRequests, setRoleRequests] = useState([]);
   const [currentPartners, setCurrentPartners] = useState([]);
   const [staffAndAdmins, setStaffAndAdmins] = useState([]);
-  const [showPartners, setShowPartners] = useState(false);
-  const [showStaffAndAdmins, setShowStaffAndAdmins] = useState(false);
+  const [openStaffModal, setOpenStaffModal] = useState(false);
 
   const fetchPartnerRequests = async () => {
     const partnerCollection = collection(db, 'partnerRequests');
@@ -19,10 +19,10 @@ const AdminDash = () => {
   };
 
   const fetchCurrentPartners = async () => {
-    const partnersCollection = collection(db, 'partner'); // Ensure this is the correct collection name
+    const partnersCollection = collection(db, 'partner');
     const partnersSnapshot = await getDocs(partnersCollection);
     const partners = partnersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    setCurrentPartners(partners); // Set all current partners
+    setCurrentPartners(partners);
   };
 
   const fetchRoleRequests = async () => {
@@ -35,7 +35,7 @@ const AdminDash = () => {
 
   useEffect(() => {
     fetchPartnerRequests();
-    fetchCurrentPartners(); // Fetch current partners
+    fetchCurrentPartners();
     fetchRoleRequests();
   }, []);
 
@@ -58,201 +58,213 @@ const AdminDash = () => {
 
   const handleRemoveStaff = async (id) => {
     const userDoc = doc(db, 'users', id);
-    await deleteDoc(userDoc);
+    await updateDoc(userDoc, {
+      accountLevel: 'guest',
+      roleStatus: 'inactive', // Optionally set this to manage the user's status further
+    });
     fetchRoleRequests();
   };
 
-  // Function to delete partner by title
   const handleDeletePartner = async (title) => {
-    const partnersCollection = collection(db, 'partner'); // Ensure this is the correct collection name
+    const partnersCollection = collection(db, 'partner');
     const partnersSnapshot = await getDocs(partnersCollection);
-    
-    // Find the partner document by title
     const partnerToDelete = partnersSnapshot.docs.find(doc => doc.data().title === title);
-    
     if (partnerToDelete) {
-      const partnerDoc = doc(db, 'partner', partnerToDelete.id); // Reference to the partner document
-      await deleteDoc(partnerDoc); // Delete the partner
-      fetchCurrentPartners(); // Refresh the current partners list
+      const partnerDoc = doc(db, 'partner', partnerToDelete.id);
+      await deleteDoc(partnerDoc);
+      fetchCurrentPartners();
     } else {
       console.error("Partner not found");
     }
   };
 
-  return (
-    <div className="container mt-4">
-      {/* Partnership Requests */}
-      <div className="mb-5">
-        <h3 className="mb-3">Partnership Requests</h3>
-        <div className="table-responsive">
-          {partnerRequests.length === 0 ? (
-            <p>No Incoming Requests</p>
-          ) : (
-            <table className="table table-bordered table-hover">
-              <thead className="table-dark">
-                <tr>
-                  <th>Partner Name</th>
-                  <th>Best Contact</th>
-                  <th>Partner Description</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {partnerRequests.map((request) => (
-                  <tr key={request.id}>
-                    <td>{request.partnerName}</td>
-                    <td>{request.bestContact}</td>
-                    <td>{request.partnerDescription}</td>
-                    <td>{request.status}</td>
-                    <td>
-                      <div className="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <button
-                          className="btn btn-success me-md-2 mb-2"
-                          onClick={() => handlePartnerAction(request.id, 'approve')}
-                        >
-                          Approve
-                        </button>
-                        <button
-                          className="btn btn-danger mb-2"
-                          onClick={() => handlePartnerAction(request.id, 'reject')}
-                        >
-                          Reject
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </div>
+  const handleOpenStaffModal = () => {
+    setOpenStaffModal(true);
+  };
 
-      {/* Toggle for Current Partners */}
-      <div className="mb-5">
-        <button className="btn btn-primary" onClick={() => setShowPartners(!showPartners)}>
-          {showPartners ? 'Hide Current Partners' : 'Manage Current Partners'}
-        </button>
-        <div className={`collapse ${showPartners ? 'show' : ''} mt-3`}>
-          <h4>Manage Partners</h4>
-          <div className="table-responsive">
-            <table className="table table-bordered table-hover">
-              <thead className="table-dark">
-                <tr>
-                  <th>Partner Name</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentPartners.map((partner) => (
-                  <tr key={partner.id}>
-                    <td>{partner.title}</td>
-                    <td>
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => handleDeletePartner(partner.title)} // Pass the title to delete
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
+  const handleCloseStaffModal = () => {
+    setOpenStaffModal(false);
+  };
+
+  return (
+    <Box sx={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
+      {/* Overview Stats */}
+      <Grid container spacing={3} sx={{ marginBottom: '20px' }}>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ padding: '20px', borderRadius: '15px', backgroundColor: '#ffffff' }}>
+            <Typography variant="h5" sx={{ marginBottom: '10px', color: '#1976d2' }}>Total Partners</Typography>
+            <Typography variant="h3">{currentPartners.length}</Typography>
+            <LinearProgress variant="determinate" value={(currentPartners.length / 100) * 100} sx={{ marginTop: '10px' }} />
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ padding: '20px', borderRadius: '15px', backgroundColor: '#ffffff' }}>
+            <Typography variant="h5" sx={{ marginBottom: '10px', color: '#1976d2' }}>Total Staff & Admins</Typography>
+            <Typography variant="h3">{staffAndAdmins.length}</Typography>
+            <LinearProgress variant="determinate" value={(staffAndAdmins.length / 100) * 100} sx={{ marginTop: '10px' }} />
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ padding: '20px', borderRadius: '15px', backgroundColor: '#ffffff' }}>
+            <Typography variant="h5" sx={{ marginBottom: '10px', color: '#1976d2' }}>Pending Requests</Typography>
+            <Typography variant="h3">{partnerRequests.length + roleRequests.length}</Typography>
+            <LinearProgress variant="determinate" value={((partnerRequests.length + roleRequests.length) / 50) * 100} sx={{ marginTop: '10px' }} />
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Partnership Requests */}
+      <Card sx={{ padding: '20px', marginBottom: '20px', borderRadius: '15px', backgroundColor: 'white' }}>
+        <Typography variant="h4" sx={{ marginBottom: '20px', color: '#1976d2' }}>Partnership Requests</Typography>
+        {partnerRequests.length === 0 ? (
+          <Typography>No Incoming Requests</Typography>
+        ) : (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Partner Name</TableCell>
+                  <TableCell>Best Contact</TableCell>
+                  <TableCell>Partner Description</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {partnerRequests.map((request) => (
+                  <TableRow key={request.id}>
+                    <TableCell>{request.partnerName}</TableCell>
+                    <TableCell>{request.bestContact}</TableCell>
+                    <TableCell>{request.partnerDescription}</TableCell>
+                    <TableCell>{request.status}</TableCell>
+                    <TableCell>
+                      <IconButton onClick={() => handlePartnerAction(request.id, 'approve')} color="success">
+                        <Check />
+                      </IconButton>
+                      <IconButton onClick={() => handlePartnerAction(request.id, 'reject')} color="error">
+                        <Clear />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </Card>
+
+      {/* Manage Current Partners */}
+      <Card sx={{ padding: '20px', marginBottom: '20px', borderRadius: '15px', backgroundColor: 'white' }}>
+        <Typography variant="h4" sx={{ marginBottom: '20px', color: '#1976d2' }}>Manage Current Partners</Typography>
+        {currentPartners.length === 0 ? (
+          <Typography>No Current Partners</Typography>
+        ) : (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Partner Name</TableCell>
+                  <TableCell>Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {currentPartners.map((partner) => (
+                  <TableRow key={partner.id}>
+                    <TableCell>{partner.title}</TableCell>
+                    <TableCell>
+                      <IconButton onClick={() => handleDeletePartner(partner.title)} color="error">
+                        <Delete />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </Card>
 
       {/* Role Change Requests */}
-      <div className="mb-5">
-        <h3 className="mb-3">Team Verification Requests</h3>
-        <div className="table-responsive">
-          {roleRequests.length === 0 ? (
-            <p>No Incoming Requests</p>
-          ) : (
-            <table className="table table-bordered table-hover">
-              <thead className="table-dark">
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Requested Role</th>
-                  <th>Current Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
+      <Card sx={{ padding: '20px', marginBottom: '20px', borderRadius: '15px', backgroundColor: 'white' }}>
+        <Typography variant="h4" sx={{ marginBottom: '20px', color: '#1976d2' }}>Team Verification Requests</Typography>
+        {roleRequests.length === 0 ? (
+          <Typography>No Incoming Requests</Typography>
+        ) : (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Email</TableCell>
+                  <TableCell>Requested Role</TableCell>
+                  <TableCell>Current Status</TableCell>
+                  <TableCell>Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
                 {roleRequests.map((user) => (
-                  <tr key={user.id}>
-                    <td>{user.firstName} {user.lastName}</td>
-                    <td>{user.email}</td>
-                    <td>{user.requestedRole}</td>
-                    <td>{user.roleStatus}</td>
-                    <td>
-                      <div className="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <button
-                          className="btn btn-success me-md-2 mb-2"
-                          onClick={() => handleRoleAction(user.id, 'approve', user.requestedRole)}
-                        >
-                          Approve
-                        </button>
-                        <button
-                          className="btn btn-danger mb-2"
-                          onClick={() => handleRoleAction(user.id, 'reject', user.requestedRole)}
-                        >
-                          Reject
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                  <TableRow key={user.id}>
+                    <TableCell>{user.firstName} {user.lastName}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.requestedRole}</TableCell>
+                    <TableCell>{user.roleStatus}</TableCell>
+                    <TableCell>
+                      <IconButton onClick={() => handleRoleAction(user.id, 'approve', user.requestedRole)} color="success">
+                        <Check />
+                      </IconButton>
+                      <IconButton onClick={() => handleRoleAction(user.id, 'reject', user.requestedRole)} color="error">
+                        <Clear />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </div>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </Card>
 
-      {/* Toggle for Staff and Admins */}
-      <div>
-        <button className="btn btn-primary" onClick={() => setShowStaffAndAdmins(!showStaffAndAdmins)}>
-          {showStaffAndAdmins ? 'Hide Staff & Admins' : 'Show Staff & Admins'}
-        </button>
-        <div className={`collapse ${showStaffAndAdmins ? 'show' : ''} mt-3`}>
-          <h4>Staff & Admins</h4>
-          <div className="table-responsive">
-            <table className="table table-bordered table-hover">
-              <thead className="table-dark">
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {staffAndAdmins.map((user) => (
-                  <tr key={user.id}>
-                    <td>{user.firstName} {user.lastName}</td>
-                    <td>{user.email}</td>
-                    <td>{user.accountLevel}</td>
-                    <td>
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => handleRemoveStaff(user.id)}
-                      >
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                               ))}
-                               </tbody>
-                             </table>
-                           </div>
-                         </div>
-                       </div>
-                     </div>
-                   );
-                 };
-                 
-                 export default AdminDash;
-            
+      {/* View Staff & Admins Button */}
+      <Button variant="outlined" onClick={handleOpenStaffModal} sx={{ marginBottom: '20px' }}>View Staff & Admins</Button>
+
+      {/* Staff & Admins Modal */}
+      <Dialog open={openStaffModal} onClose={handleCloseStaffModal}>
+        <DialogTitle>Staff & Admins</DialogTitle>
+        <DialogContent>
+          {staffAndAdmins.length === 0 ? (
+            <Typography>No Staff or Admins Available</Typography>
+          ) : (
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Email</TableCell>
+                    <TableCell>Level</TableCell>
+                    <TableCell>Action</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {staffAndAdmins.map((member) => (
+                    <TableRow key={member.id}>
+                      <TableCell>{member.firstName} {member.lastName}</TableCell>
+                      <TableCell>{member.email}</TableCell>
+                      <TableCell>{member.accountLevel}</TableCell>
+                      <TableCell>
+                        <IconButton onClick={() => handleRemoveStaff(member.id)} color="error">
+                          <Delete />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DialogContent>
+      </Dialog>
+    </Box>
+  );
+};
+
+export default AdminDash;

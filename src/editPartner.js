@@ -1,30 +1,47 @@
 import React, { useState } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // Import Quill stylesheet
 import { storage, db } from './Firebase/Firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { collection, addDoc } from 'firebase/firestore';
+import { TextField, Button, Box, CircularProgress, Typography, LinearProgress, Stepper, Step, StepLabel } from '@mui/material';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 function EditPartnerPage() {
-    const [editorContent, setEditorContent] = useState('');
     const [title, setTitle] = useState('');
     const [websiteLink, setWebsiteLink] = useState('');
+    const [orgHead, setOrgHead] = useState(''); // Organization Head Name
+    const [groupDescription, setGroupDescription] = useState(''); // Simple text area for description
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false); // State to manage loading status
+    const [progress, setProgress] = useState(0); // For linear progress
 
-    // Handle editor content change
-    const handleEditorChange = (value) => {
-        setEditorContent(value);
-    };
+    const steps = ['Title', 'Website Link', 'Organization Head', 'Description', 'Upload Image'];
 
-    // Handle file input change
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
         if (selectedFile && selectedFile.type.startsWith('image/')) {
             setFile(selectedFile);
         } else {
             alert('Please upload a valid image file.');
-            setFile(null); // Reset if the file is not an image
+            setFile(null); 
+        }
+    };
+
+    // Check if each field is filled to determine step completion
+    const isStepCompleted = (step) => {
+        switch (step) {
+            case 0:
+                return title;
+            case 1:
+                return websiteLink;
+            case 2:
+                return orgHead;
+            case 3:
+                return groupDescription;
+            case 4:
+                return file;
+            default:
+                return false;
         }
     };
 
@@ -32,125 +49,182 @@ function EditPartnerPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Check if a file is selected
         if (!file) {
             alert('Please select an image to upload.');
             return;
         }
 
-        setLoading(true); // Start loading
+        setLoading(true);
+        setProgress(25);
 
         try {
-            // Upload the image to Firebase Storage
             const storageRef = ref(storage, `logos/${file.name}`);
             await uploadBytes(storageRef, file);
-            console.log('File uploaded successfully');
+            setProgress(50);
 
-            // Get the download URL
             const downloadURL = await getDownloadURL(storageRef);
+            setProgress(75);
 
-            // Prepare the partner data to store in Firestore
             const partnerData = {
                 title,
                 websiteLink,
-                groupDescription: editorContent,
-                logoURL: downloadURL // Store the download link of the logo
+                groupDescription,
+                logoURL: downloadURL,
+                orgHead
             };
 
-            // Add the partner data to Firestore
             const partnersCollection = collection(db, 'partner');
             await addDoc(partnersCollection, partnerData);
-            console.log('Partner info uploaded successfully');
+            setProgress(100);
 
             alert('Upload successful!');
-
             setTitle('');
             setWebsiteLink('');
-            setEditorContent('');
-            setFile(null); 
+            setOrgHead('');
+            setGroupDescription('');
+            setFile(null);
+            setProgress(0);
 
             document.getElementById('fileUpload').value = ''; 
         } catch (error) {
             console.error('Error uploading partner info:', error);
         } finally {
-            setLoading(false); 
+            setLoading(false);
         }
     };
 
     return (
-        <div className="container mt-5">
-            <div className="card p-4 shadow-sm" style={{ backgroundColor: '#F0F4FF', borderRadius: '12px' }}>
-                <h2 className="mb-4" style={{ color: 'black' }}>Add Partner Page</h2>
+        <Box 
+            sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginTop: '50px',
+            }}
+        >
+            <Box 
+                sx={{
+                    width: '100%',  // Increase width to 90% of the screen
+                    maxWidth: '1400px',  // Max width increased to 1100px
+                    backgroundColor: '#e4e7ed', 
+                    padding: '32px', 
+                    borderRadius: '16px', 
+                    boxShadow: 6,
+                }}
+            >
+                <Typography variant="h4" component="h2" gutterBottom sx={{ color: '#1E3A8A', fontWeight: 'bold' }}>
+                    Add a new Partner
+                </Typography>
+                <p>Please include "https://" before the link</p>
+                <p className='mb-4'>If the Club doesn't have a website link one of their socials</p>
+
+
+                <Stepper activeStep={steps.findIndex((_, idx) => !isStepCompleted(idx))} alternativeLabel>
+                    {steps.map((label, index) => (
+                        <Step key={label} completed={isStepCompleted(index)}>
+                            <StepLabel>
+                                {isStepCompleted(index) ? <CheckCircleIcon color="success" /> : label}
+                            </StepLabel>
+                        </Step>
+                    ))}
+                </Stepper>
 
                 <form onSubmit={handleSubmit}>
-                    <div className="form-group mb-4">
-                        <label htmlFor="title" style={{ color: 'black' }}>Title</label>
-                        <input
-                            type="text"
-                            id="title"
-                            className="form-control"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            required
-                            style={{ backgroundColor: 'white', color: 'black', border: '1px solid #1E3A8A' }}
-                        />
-                    </div>
+                    {/* Title Input */}
+                    <TextField
+                        id="title"
+                        label="Title"
+                        variant="standard"
+                        fullWidth
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        required
+                        sx={{ mb: 4 }}
+                    />
 
-                    {/* Website link input */}
-                    <div className="form-group mb-4">
-                        <label htmlFor="websiteLink" style={{ color: 'black' }}>Website Link</label>
-                        <input
-                            type="url"
-                            id="websiteLink"
-                            className="form-control"
-                            value={websiteLink}
-                            onChange={(e) => setWebsiteLink(e.target.value)}
-                            style={{ backgroundColor: 'white', color: 'black', border: '1px solid #1E3A8A' }}
-                        />
-                    </div>
+                    {/* Website Link Input */}
+                    <TextField
+                        id="websiteLink"
+                        label="Website Link"
+                        variant="standard"
+                        fullWidth
+                        value={websiteLink}
+                        onChange={(e) => setWebsiteLink(e.target.value)}
+                        required
+                        sx={{ mb: 4 }}
+                    />
 
-                    {/* Group Description (using ReactQuill) */}
-                    <div className="form-group mb-4">
-                        <label htmlFor="description" style={{ color: '#1E3A8A' }}>Group Description</label>
-                        <ReactQuill 
-                            value={editorContent} 
-                            onChange={handleEditorChange} 
-                            style={{ backgroundColor: 'white', color: '#1E3A8A', maxHeight: '150px', minHeight: '150px' }}
-                        />
-                    </div>
+                    {/* Organization Head Input */}
+                    <TextField
+                        id="orgHead"
+                        label="Organization Head Name"
+                        variant="standard"
+                        fullWidth
+                        value={orgHead}
+                        onChange={(e) => setOrgHead(e.target.value)}
+                        sx={{ mb: 4 }}
+                    />
 
-                    {/* File input */}
-                    <div className="form-group mb-4">
-                        <label htmlFor="fileUpload" style={{ color: '#1E3A8A' }}>Upload Group Logo</label>
+                    {/* Description Input */}
+                    <TextField
+                        id="groupDescription"
+                        label="Group Description"
+                        variant="standard"
+                        multiline
+                        fullWidth
+                        rows={4}
+                        value={groupDescription}
+                        onChange={(e) => setGroupDescription(e.target.value)}
+                        sx={{ mb: 4 }}
+                    />
+
+                    {/* File Upload Button */}
+                    <Button
+                        variant="contained"
+                        component="label"
+                        color="primary"
+                        fullWidth
+                        startIcon={<UploadFileIcon />}
+                        sx={{
+                            backgroundColor: '#1E3A8A',
+                            mb: 4,
+                            padding: '12px', 
+                            textTransform: 'none',
+                        }}
+                    >
+                        {file ? file.name : 'Upload Logo Image'}
                         <input
                             type="file"
                             id="fileUpload"
-                            className="form-control"
                             onChange={handleFileChange}
-                            accept="image/*" // Only allow image files
-                            style={{ backgroundColor: '#E0E7FF', color: '#1E3A8A', border: '1px solid #1E3A8A' }}
+                            accept="image/*"
+                            hidden
                         />
-                    </div>
+                    </Button>
 
-                    {/* Submit button */}
-                    <button 
-                        type="submit" 
-                        className="btn btn-primary" 
-                        style={{ backgroundColor: '#1E3A8A', borderColor: '#1E3A8A' }}
-                        disabled={loading} // Disable button during loading
+                    {/* Progress bar displayed when the upload starts */}
+                    {progress > 0 && (
+                        <LinearProgress variant="determinate" value={progress} sx={{ mb: 4 }} />
+                    )}
+
+                    <Button 
+                        variant="contained" 
+                        color="primary" 
+                        fullWidth 
+                        type="submit"
+                        disabled={loading}
+                        sx={{ backgroundColor: '#1E3A8A', padding: '12px', fontWeight: 'bold' }}
                     >
-                        {loading ? 'Uploading...' : 'Upload Partner Info'}
-                    </button>
+                        {loading ? <CircularProgress size={24} sx={{ color: '#ffffff' }} /> : 'Upload Partner Info'}
+                    </Button>
                 </form>
 
-                {/* Optional loading spinner or message */}
                 {loading && (
-                    <div className="mt-3" style={{ color: '#1E3A8A' }}>
-                        <p>Uploading your information, please wait...</p>
-                    </div>
+                    <Typography variant="body2" sx={{ color: '#1E3A8A', mt: 2 }}>
+                        Uploading your information, please wait...
+                    </Typography>
                 )}
-            </div>
-        </div>
+            </Box>
+        </Box>
     );
 }
 
