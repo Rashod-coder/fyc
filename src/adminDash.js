@@ -16,7 +16,13 @@ const AdminDash = () => {
     const partnerSnapshot = await getDocs(partnerCollection);
     const partners = partnerSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     setPartnerRequests(partners.filter(req => req.status === 'pending'));
-    setCurrentPartners(partners.filter(req => req.status === 'approved'));
+  };
+
+  const fetchCurrentPartners = async () => {
+    const partnersCollection = collection(db, 'partner'); // Ensure this is the correct collection name
+    const partnersSnapshot = await getDocs(partnersCollection);
+    const partners = partnersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    setCurrentPartners(partners); // Set all current partners
   };
 
   const fetchRoleRequests = async () => {
@@ -29,6 +35,7 @@ const AdminDash = () => {
 
   useEffect(() => {
     fetchPartnerRequests();
+    fetchCurrentPartners(); // Fetch current partners
     fetchRoleRequests();
   }, []);
 
@@ -53,6 +60,23 @@ const AdminDash = () => {
     const userDoc = doc(db, 'users', id);
     await deleteDoc(userDoc);
     fetchRoleRequests();
+  };
+
+  // Function to delete partner by title
+  const handleDeletePartner = async (title) => {
+    const partnersCollection = collection(db, 'partner'); // Ensure this is the correct collection name
+    const partnersSnapshot = await getDocs(partnersCollection);
+    
+    // Find the partner document by title
+    const partnerToDelete = partnersSnapshot.docs.find(doc => doc.data().title === title);
+    
+    if (partnerToDelete) {
+      const partnerDoc = doc(db, 'partner', partnerToDelete.id); // Reference to the partner document
+      await deleteDoc(partnerDoc); // Delete the partner
+      fetchCurrentPartners(); // Refresh the current partners list
+    } else {
+      console.error("Partner not found");
+    }
   };
 
   return (
@@ -108,27 +132,30 @@ const AdminDash = () => {
       {/* Toggle for Current Partners */}
       <div className="mb-5">
         <button className="btn btn-primary" onClick={() => setShowPartners(!showPartners)}>
-          {showPartners ? 'Hide Current Partners' : 'Show Current Partners'}
+          {showPartners ? 'Hide Current Partners' : 'Manage Current Partners'}
         </button>
         <div className={`collapse ${showPartners ? 'show' : ''} mt-3`}>
-          <h4>Current Partners</h4>
+          <h4>Manage Partners</h4>
           <div className="table-responsive">
             <table className="table table-bordered table-hover">
               <thead className="table-dark">
                 <tr>
                   <th>Partner Name</th>
-                  <th>Best Contact</th>
-                  <th>Partner Description</th>
-                  <th>Org Head Name</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {currentPartners.map((partner) => (
                   <tr key={partner.id}>
-                    <td>{partner.partnerName}</td>
-                    <td>{partner.bestContact}</td>
-                    <td>{partner.partnerDescription}</td>
-                    <td>{partner.orgHeadName}</td>
+                    <td>{partner.title}</td>
+                    <td>
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => handleDeletePartner(partner.title)} // Pass the title to delete
+                      >
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -217,14 +244,15 @@ const AdminDash = () => {
                       </button>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default AdminDash;
+                               ))}
+                               </tbody>
+                             </table>
+                           </div>
+                         </div>
+                       </div>
+                     </div>
+                   );
+                 };
+                 
+                 export default AdminDash;
+            
