@@ -60,7 +60,7 @@ const AdminDash = () => {
     const userDoc = doc(db, 'users', id);
     await updateDoc(userDoc, {
       accountLevel: 'guest',
-      roleStatus: 'inactive', // Optionally set this to manage the user's status further
+      roleStatus: 'inactive',
     });
     fetchRoleRequests();
   };
@@ -224,45 +224,8 @@ const AdminDash = () => {
         )}
       </Card>
 
-      {/* View Staff & Admins Button */}
-      <Button variant="outlined" onClick={handleOpenStaffModal} sx={{ marginBottom: '20px' }}>View Staff & Admins</Button>
 
-      {/* Staff & Admins Modal */}
-      <Dialog open={openStaffModal} onClose={handleCloseStaffModal}>
-        <DialogTitle>Staff & Admins</DialogTitle>
-        <DialogContent>
-          {staffAndAdmins.length === 0 ? (
-            <Typography>No Staff or Admins Available</Typography>
-          ) : (
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Email</TableCell>
-                    <TableCell>Level</TableCell>
-                    <TableCell>Action</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {staffAndAdmins.map((member) => (
-                    <TableRow key={member.id}>
-                      <TableCell>{member.firstName} {member.lastName}</TableCell>
-                      <TableCell>{member.email}</TableCell>
-                      <TableCell>{member.accountLevel}</TableCell>
-                      <TableCell>
-                        <IconButton onClick={() => handleRemoveStaff(member.id)} color="error">
-                          <Delete />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </DialogContent>
-      </Dialog>
+      
     </Box>
   );
 };

@@ -7,7 +7,7 @@ import Epartner from './editPartner';
 import VerifyRoleRequest from './Verify';
 import GuestDashboard from './guestDash';
 import AdminDash from './adminDash';
-import { Box, Typography, Button, CircularProgress, Avatar, Card, Grid } from '@mui/material';
+import { Box, Typography, Button, CircularProgress, Avatar, Card, Grid, Paper } from '@mui/material';
 import { AccountCircle, Star } from '@mui/icons-material';
 
 function Dashboard() {
@@ -29,6 +29,9 @@ function Dashboard() {
         } else {
             return 'Good Night';
         }
+    };
+    const handleRedirect = () => {
+        navigate('/members'); // Redirect to members page
     };
 
     useEffect(() => {
@@ -84,7 +87,7 @@ function Dashboard() {
                         <Avatar src={profilePicUrl} alt={userName} sx={{ width: 60, height: 60, marginRight: 2 }} />
                     </Grid>
                     <Grid item xs>
-                        <Typography variant="h4" sx={{ color: '#00796b', fontWeight: 'bold' }}>
+                        <Typography variant="h4" sx={{ color: 'black', fontWeight: 'bold' }}>
                             {greeting}, {userName}!
                         </Typography>
                         <Typography variant="body1" sx={{ color: '#555', display: 'flex', alignItems: 'center' }}>
@@ -111,9 +114,74 @@ function Dashboard() {
                     <Card sx={{ padding: '1.5rem', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
                         <Epartner />
                     </Card>
+                    <Paper 
+  elevation={3} 
+  sx={{ padding: '1rem', marginTop: '2rem', textAlign: 'center', backgroundColor: '#f5f5f5' }}
+>
+  <Typography variant="h5" sx={{ marginBottom: '1rem' }}>
+    Quick Actions
+  </Typography>
+  
+  <Grid container spacing={2}>
+    <Grid item xs={12} sm={4} display="flex" justifyContent="center">
+      <Button
+        variant="contained"
+        color="default"
+        sx={{ 
+          padding: '0.5rem 1rem',
+          fontSize: '1rem',
+          backgroundColor: '#000', 
+          color: '#fff', 
+          '&:hover': { backgroundColor: '#333' } 
+        }} 
+        onClick={handleRedirect} // Redirect function
+      >
+        Manage Team & View Insights
+      </Button>
+    </Grid>
+    <Grid item xs={12} sm={4} display="flex" justifyContent="center">
+      <Button
+        variant="contained"
+        color="default"
+        sx={{ 
+          padding: '0.5rem 1rem',
+          fontSize: '1rem',
+          backgroundColor: '#000', 
+          color: '#fff', 
+          '&:hover': { backgroundColor: '#333' } 
+        }} 
+        onClick={handleRedirect} // Redirect function
+      >
+        Make an Announcement
+      </Button>
+    </Grid>
+    <Grid item xs={12} sm={4} display="flex" justifyContent="center">
+      <Button
+        variant="contained"
+        color="default"
+        sx={{ 
+          padding: '0.5rem 1rem',
+          fontSize: '1rem',
+          backgroundColor: '#000', 
+          color: '#fff', 
+          '&:hover': { backgroundColor: '#333' } 
+        }} 
+        onClick={handleRedirect} // Redirect function
+      >
+        Manage Pages
+      </Button>
+    </Grid>
+  </Grid>
+</Paper>
+                    
+ 
+
+
                     <Card sx={{ padding: '1.5rem', marginTop: '1rem', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
                         <AdminDash />
                     </Card>
+                    
+                    
                 </Box>
             )}
 

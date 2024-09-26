@@ -7,16 +7,15 @@ import Box from '@mui/material/Box';
 
 const TeamsPage = () => {
   const [teamMembers, setTeamMembers] = useState([]);
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(true); 
 
-  // Fetch data from Firebase Firestore
   useEffect(() => {
     const fetchTeamMembers = async () => {
       const usersCollection = collection(db, 'users');
       const usersSnapshot = await getDocs(usersCollection);
       const usersList = usersSnapshot.docs.map(doc => doc.data());
       setTeamMembers(usersList);
-      setLoading(false); // Set loading to false after fetching data
+      setLoading(false); 
     };
 
     fetchTeamMembers();
@@ -24,7 +23,7 @@ const TeamsPage = () => {
 
   return (
     <div className="container my-5">
-      {loading ? ( // Show loading spinner while fetching data
+      {loading ? ( 
         <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
           <CircularProgress />
         </Box>

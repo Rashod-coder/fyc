@@ -114,19 +114,48 @@ function EditPartnerPage() {
                 <Typography variant="h4" component="h2" gutterBottom sx={{ color: '#1E3A8A', fontWeight: 'bold' }}>
                     Add a new Partner
                 </Typography>
-                <p>Please include "https://" before the link</p>
-                <p className='mb-4'>If the Club doesn't have a website link one of their socials</p>
+                <ul>
+    <li>Please include "https://" before the link</li>
+    <li className='mb-4'>If the Club doesn't have a website link, use one of their socials</li>
+</ul>
 
 
-                <Stepper activeStep={steps.findIndex((_, idx) => !isStepCompleted(idx))} alternativeLabel>
-                    {steps.map((label, index) => (
-                        <Step key={label} completed={isStepCompleted(index)}>
-                            <StepLabel>
-                                {isStepCompleted(index) ? <CheckCircleIcon color="success" /> : label}
-                            </StepLabel>
-                        </Step>
-                    ))}
-                </Stepper>
+<Stepper activeStep={steps.findIndex((_, idx) => !isStepCompleted(idx))} alternativeLabel>
+    {steps.map((label, index) => (
+        <Step key={label} completed={isStepCompleted(index)}>
+            <StepLabel 
+                StepIconComponent={({ active, completed }) => (
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        {completed ? (
+                            <CheckCircleIcon color="success" />
+                        ) : (
+                            <div style={{
+                                width: 24,
+                                height: 24,
+                                borderRadius: '50%',
+                                backgroundColor: active ? '#1976d2' : 'transparent', // Blue when active
+                                border: '2px solid #ccc', // Outline for inactive steps
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}>
+                                {active && <div style={{
+                                    width: 12,
+                                    height: 12,
+                                    backgroundColor: '#1976d2',
+                                    borderRadius: '50%',
+                                }} />}
+                            </div>
+                        )}
+                    </div>
+                )}
+            >
+                {label}
+            </StepLabel>
+        </Step>
+    ))}
+</Stepper>
+
 
                 <form onSubmit={handleSubmit}>
                     {/* Title Input */}

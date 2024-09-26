@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db, storage } from './Firebase/Firebase'; // Firebase imports
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'; // For file uploads
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'; // For file upload with progress
+import { TextField, Button, Box, LinearProgress, Typography, CircularProgress, Fade } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 function Settings() {
@@ -18,10 +18,12 @@ function Settings() {
     });
     const [file, setFile] = useState(null);
     const [updating, setUpdating] = useState(false);
-    const [updateSuccess, setUpdateSuccess] = useState(false); // To show success message
-    const [filePreview, setFilePreview] = useState(null); // State for file preview
+    const [updateSuccess, setUpdateSuccess] = useState(false);
+    const [filePreview, setFilePreview] = useState(null);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [showProgress, setShowProgress] = useState(false); // To show/hide progress bar
     const navigate = useNavigate();
-    
+
     useEffect(() => {
         const fetchUserData = async () => {
             const user = auth.currentUser;
@@ -53,31 +55,53 @@ function Settings() {
         if (e.target.files[0]) {
             const selectedFile = e.target.files[0];
             setFile(selectedFile);
-            // Create a preview URL for the selected file
             const previewUrl = URL.createObjectURL(selectedFile);
-            setFilePreview(previewUrl); // Update preview state
+            setFilePreview(previewUrl);
         }
     };
 
     const handleSaveChanges = async () => {
         setUpdating(true);
-        setUpdateSuccess(false); // Reset success state before updating
+        setUpdateSuccess(false);
+        setShowProgress(false); // Reset progress bar visibility
         const user = auth.currentUser;
+
         try {
             const userDocRef = doc(db, 'users', user.uid);
 
-            // If a new profile picture is selected, upload it
             if (file) {
                 const storageRef = ref(storage, `profilePictures/${user.uid}`);
-                await uploadBytes(storageRef, file);
-                const profilePicUrl = await getDownloadURL(storageRef);
-                await updateDoc(userDocRef, { ...userData, profilePicUrl });
-            } else {
-                await updateDoc(userDocRef, userData); // If no file, just update text fields
-            }
+                const uploadTask = uploadBytesResumable(storageRef, file);
 
-            setUpdateSuccess(true); // Set success message when update is done
-            setUpdating(false);
+                setShowProgress(true); // Show progress bar when upload starts
+
+                uploadTask.on(
+                    'state_changed',
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+
+                        // Simulate a delay for smoother progress
+                        setTimeout(() => {
+                            setUploadProgress(progress);
+                        }, 200); // Small delay to smoothen out fast uploads
+                    },
+                    (error) => {
+                        console.error('File upload error:', error);
+                        setUpdating(false);
+                    },
+                    async () => {
+                        const profilePicUrl = await getDownloadURL(uploadTask.snapshot.ref);
+                        await updateDoc(userDocRef, { ...userData, profilePicUrl });
+                        setUpdateSuccess(true);
+                        setUpdating(false);
+                        setTimeout(() => setShowProgress(false), 500); // Fade out progress bar after upload completes
+                    }
+                );
+            } else {
+                await updateDoc(userDocRef, userData);
+                setUpdateSuccess(true);
+                setUpdating(false);
+            }
         } catch (error) {
             console.error('Error updating user profile:', error);
             setUpdating(false);
@@ -86,251 +110,175 @@ function Settings() {
 
     if (loading) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </div>
-            </div>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <CircularProgress />
+            </Box>
         );
     }
 
     return (
-        <div style={{
-            background: 'linear-gradient(to right, #e0f7fa, #f0f4f8)',
-            minHeight: '100vh',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: '20px'
-        }}>
-            <div style={{
-                background: 'rgba(255, 255, 255, 0.2)', // Frosted glass effect
-                backdropFilter: 'blur(10px)', // Glass blur
-                padding: '40px',
-                borderRadius: '20px',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                maxWidth: '90%', // Increased max width
-                width: '100%',
-                color: '#333'
-            }}>
-                <h2 className="text-center mb-4" style={{ fontSize: '2.5rem', color: '#0277bd' }}>Edit Profile</h2>
+        <Box
+            sx={{
+                backgroundColor: '#f0f4f8',
+                minHeight: '100vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: 3,
+            }}
+        >
+            <Box
+                sx={{
+                    backgroundColor: '#fff',
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    padding: 4,
+                    width: '90%', // Wider layout
+                    maxWidth: '950px', // Increased max-width for wider form
+                    color: '#333',
+                }}
+            >
+                <Typography variant="h4" align="center" color="primary" gutterBottom>
+                    Edit Profile
+                </Typography>
 
                 {updateSuccess && (
-                    <div className="alert alert-success text-center" role="alert">
+                    <Typography align="center" sx={{ color: 'green', mb: 2 }}>
                         Profile updated successfully!
-                    </div>
+                    </Typography>
                 )}
 
-                <div className="mb-4 text-center">    
-                    <label htmlFor="profilePic" style={{
-                        display: 'inline-block',
-                        padding: '0.75rem 1.5rem',
-                        backgroundColor: '#007BFF', // Bootstrap primary color
-                        color: '#ffffff',            // White text color
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                        textAlign: 'center',
-                        fontWeight: 'bold',
-                        transition: 'background-color 0.3s',
-                        border: '2px dashed #007BFF', // Dashed border for upload indication
-                        width: '200px', // Fixed width
-                        margin: '1rem 30px' // Increased horizontal margin
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0056b3'} // Darker shade on hover
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#007BFF'} // Original color on leave
+                <Box sx={{ mb: 3, textAlign: 'center' }}>
+                    <Button
+                        variant="contained"
+                        component="label"
+                        sx={{ mb: 2 }}
+                        color="primary"
                     >
-                        <i className="bi bi-upload" style={{ marginRight: '0.5rem' }}></i> Upload Profile Picture Here
-                    </label>
-
-                    <input
-                        type="file"
-                        className="form-control"
-                        id="profilePic"
-                        onChange={handleFileChange}
-                        accept="image/*" // Restrict to image file types
-                        style={{
-                            display: 'none'
-                        }}
-                    />
-                    
-                    {/* Show the preview of the new profile picture or existing one */}
-                    <img
-                        src={filePreview || userData.profilePicUrl}
-                        alt="Profile"
-                        className="mt-3 rounded-circle"
-                        style={{
-                            width: '200px',
-                            height: '200px',
-                            objectFit: 'cover',
-                            cursor: 'pointer',
-                            border: '3px solid black',
-                            padding: '5px',
-                            transition: 'all 0.3s ease-in-out',
-                            marginTop: '20px', // Add margin to separate from the button
-                            marginLeft: '30px', // Increased left margin for more spacing
-                            marginRight: '30px' // Increased right margin for more spacing
-                        }}
-                    />
-                </div>
-
-                <div className="row">
-                    <div className="col-md-6 mb-4">
-                        <label htmlFor="name" className="form-label" style={{ fontSize: '1.2rem', fontWeight: 'lighter' }}>Name</label>
+                        Upload Profile Picture
                         <input
-                            type="text"
-                            className="form-control"
-                            id="name"
-                            name="name"
-                            value={userData.name || ''}
-                            onChange={handleInputChange}
-                            style={{
-                                width: '100%',
-                                padding: '10px 10px 10px 40px', 
-                                fontSize: '1rem',
-                                color: '#000',
-                                border: 'none',
-                                borderBottom: '2px solid #000',
-                                outline: 'none',
-                                background: 'transparent',
-                              }}
+                            type="file"
+                            hidden
+                            accept="image/*"
+                            onChange={handleFileChange}
                         />
-                    </div>
-
-                    <div className="col-md-6 mb-4">
-                        <label htmlFor="linkedin" className="form-label" style={{ fontSize: '1.2rem', fontWeight: 'lighter' }}>LinkedIn</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            id="linkedin"
-                            name="linkedin"
-                            value={userData.linkedin || ''}
-                            onChange={handleInputChange}
-                            style={{
-                                width: '100%',
-                                padding: '10px 10px 10px 40px', 
-                                fontSize: '1rem',
-                                color: '#000',
-                                border: 'none',
-                                borderBottom: '2px solid #000',
-                                outline: 'none',
-                                background: 'transparent',
-                              }}
+                    </Button>
+                    {filePreview && (
+                        <Box
+                            component="img"
+                            src={filePreview}
+                            alt="Profile Preview"
+                            sx={{
+                                width: '200px',
+                                height: '200px',
+                                objectFit: 'cover',
+                                borderRadius: '50%',
+                                display: 'block',
+                                margin: 'auto',
+                                border: '3px solid black',
+                                mb: 2
+                            }}
                         />
-                    </div>
-                </div>
+                    )}
 
-                <div className="row">
-                    <div className="col-md-6 mb-4">
-                        <label htmlFor="instagram" className="form-label" style={{ fontSize: '1.2rem', fontWeight: 'lighter' }}>Instagram</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            id="instagram"
-                            name="instagram"
-                            value={userData.instagram || ''}
-                            onChange={handleInputChange}
-                            style={{
-                                width: '100%',
-                                padding: '10px 10px 10px 40px', 
-                                fontSize: '1rem',
-                                color: '#000',
-                                border: 'none',
-                                borderBottom: '2px solid #000',
-                                outline: 'none',
-                                background: 'transparent',
-                              }}
-                        />
-                    </div>
+                    {/* Progress bar */}
+                    {showProgress && (
+                        <Fade in={showProgress} timeout={500}>
+                            <Box sx={{ mb: 2 }}>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={uploadProgress}
+                                    sx={{
+                                        height: 10,
+                                        borderRadius: 5,
+                                        backgroundColor: '#f0f0f0',
+                                        '& .MuiLinearProgress-bar': {
+                                            backgroundColor: '#3f51b5', // Progress bar color
+                                        },
+                                    }}
+                                />
+                                <Typography align="center" sx={{ mt: 1 }}>
+                                    {Math.round(uploadProgress)}% uploaded
+                                </Typography>
+                            </Box>
+                        </Fade>
+                    )}
+                </Box>
 
-                    <div className="col-md-6 mb-4">
-                        <label htmlFor="school" className="form-label" style={{ fontSize: '1.2rem', fontWeight: 'lighter' }}>Current School</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            id="school"
-                            name="school"
-                            value={userData.school || ''}
-                            onChange={handleInputChange}
-                            style={{
-                                width: '100%',
-                                padding: '10px 10px 10px 40px', 
-                                fontSize: '1rem',
-                                color: '#000',
-                                border: 'none',
-                                borderBottom: '2px solid #000',
-                                outline: 'none',
-                                background: 'transparent',
-                              }}
-                        />
-                    </div>
-                </div>
+                <TextField
+                    label="Name"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    name="name"
+                    value={userData.name}
+                    onChange={handleInputChange}
+                />
 
-                <div className="mb-4">
-                    <label htmlFor="role" className="form-label" style={{ fontSize: '1.2rem', fontWeight: 'lighter' }}>Role in Club</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        id="role"
-                        name="role"
-                        value={userData.role || ''}
-                        onChange={handleInputChange}
-                        style={{
-                            width: '100%',
-                            padding: '10px 10px 10px 40px', 
-                            fontSize: '1rem',
-                            color: '#000',
-                            border: 'none',
-                            borderBottom: '2px solid #000',
-                            outline: 'none',
-                            background: 'transparent',
-                          }}
-                    />
-                </div>
+                <TextField
+                    label="LinkedIn"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    name="linkedin"
+                    value={userData.linkedin}
+                    onChange={handleInputChange}
+                />
 
-                <div className="mb-4">
-                    <label htmlFor="bio" className="form-label" style={{ fontSize: '1.2rem', fontWeight: 'lighter' }}>About Me</label>
-                    <textarea
-                        className="form-control"
-                        id="bio"
-                        name="bio"
-                        rows="4"
-                        value={userData.bio || ''}
-                        onChange={handleInputChange}
-                        style={{
-                            width: '100%',
-                            padding: '10px 10px 10px 40px', 
-                            fontSize: '1rem',
-                            color: '#000',
-                            border: 'none',
-                            borderBottom: '2px solid #000',
-                            outline: 'none',
-                            background: 'transparent',
-                          }}
-                    ></textarea>
-                </div>
+                <TextField
+                    label="Instagram"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    name="instagram"
+                    value={userData.instagram}
+                    onChange={handleInputChange}
+                />
 
-                <button
-                    className="btn w-100"
+                <TextField
+                    label="School"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    name="school"
+                    value={userData.school}
+                    onChange={handleInputChange}
+                />
+
+                <TextField
+                    label="Role"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    name="role"
+                    value={userData.role}
+                    onChange={handleInputChange}
+                />
+
+                <TextField
+                    label="Bio"
+                    variant="outlined"
+                    fullWidth
+                    multiline
+                    rows={4}
+                    margin="normal"
+                    name="bio"
+                    value={userData.bio}
+                    onChange={handleInputChange}
+                />
+
+                <Button
+                    variant="contained"
+                    color="primary"
+                    fullWidth
                     onClick={handleSaveChanges}
                     disabled={updating}
-                    style={{
-                        fontSize: '1.2rem',
-                        padding: '15px',
-                        borderRadius: '30px',
-                        backgroundColor: '#0277bd',
-                        color: 'white',
-                        border: 'none',
-                        transition: 'background 0.3s ease'
-                    }}
+                    sx={{ mt: 3, padding: 1.5, fontSize: '1.2rem', borderRadius: '30px' }}
                 >
-                    {updating ? (
-                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    ) : (
-                        'Save Changes'
-                    )}
-                </button>
-            </div>
-        </div>
+                    {updating ? 'Saving...' : 'Save Changes'}
+                </Button>
+            </Box>
+        </Box>
     );
 }
 
