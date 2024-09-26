@@ -70,7 +70,8 @@ function EditPartnerPage() {
                 websiteLink,
                 groupDescription,
                 logoURL: downloadURL,
-                orgHead
+                orgHead,
+                status: 'active'
             };
 
             const partnersCollection = collection(db, 'partner');
@@ -185,7 +186,7 @@ function EditPartnerPage() {
                     {/* Organization Head Input */}
                     <TextField
                         id="orgHead"
-                        label="Organization Head Name"
+                        label="Organization Owner"
                         variant="standard"
                         fullWidth
                         value={orgHead}

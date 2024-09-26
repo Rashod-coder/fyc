@@ -37,7 +37,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import BarChartIcon from '@mui/icons-material/BarChart'; 
 import { Bar } from 'react-chartjs-2'; 
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-
+import AdminPartner from './adminPartner';
 // Registering the required Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -144,7 +144,6 @@ const MembersPage = () => {
     member.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     member.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     member.accountLevel.toLowerCase().includes(searchTerm.toLowerCase())
-
   );
 
   const memberStats = {
@@ -179,24 +178,23 @@ const MembersPage = () => {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-             Managment
+            Management
           </Typography>
-    
         </Toolbar>
       </AppBar>
       
       <Tabs value={tabValue} onChange={handleTabChange} sx={{ marginTop: '1rem' }}>
         <Tab label="Manage Members" />
         <Tab label="Member Statistics" />
+        <Tab label="Manage Partners" /> 
       </Tabs>
 
       {tabValue === 0 && (
         <Grid container spacing={3} sx={{ marginTop: '1rem' }}>
-            
           <Grid item xs={12}>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-             You can filter by role and name in the search bar
-        </Typography>
+            <Typography variant="h6" sx={{ flexGrow: 1 }}>
+              You can filter by role and name in the search bar
+            </Typography>
             <Card variant="outlined" sx={{ padding: '2rem' }}>
               <TextField
                 label="Search Members"
@@ -296,6 +294,14 @@ const MembersPage = () => {
         </Grid>
       )}
 
+      {tabValue === 2 && (
+        <Grid container spacing={3} sx={{ marginTop: '1rem' }}>
+          <Grid item xs={12}>
+            <AdminPartner />
+          </Grid>
+        </Grid>
+      )}
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
@@ -313,3 +319,5 @@ const MembersPage = () => {
 };
 
 export default MembersPage;
+
+                           

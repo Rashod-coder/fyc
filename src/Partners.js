@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { storage, db } from './Firebase/Firebase';
 import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './PartnersPage.css'; // Import CSS for animations
+import { Box, Typography, TextField, Button, Grid, Card, CardContent, CardMedia, Pagination, CircularProgress } from '@mui/material';
 
 function PartnersPage({ currentUser }) {
     const [partners, setPartners] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [partnersPerPage] = useState(9);
 
     useEffect(() => {
         const fetchPartners = async () => {
@@ -40,78 +44,92 @@ function PartnersPage({ currentUser }) {
         }
     };
 
-    return (
-        <div className="partners-page container my-5">
-            {loading && (
-                <div className="loading-overlay d-flex justify-content-center align-items-center">
-                    <div className="spinner-border" role="status">
-                        <span className="sr-only"></span>
-                    </div>
-                </div>
-            )}
-            <div className="bg-white rounded shadow p-4">
-                <h1 className="text-center text-primary mb-4">Our Partners</h1>
-                
-                <div className="mb-4 p-3 bg-light rounded text-center">
-                    <h2 className="text-primary">Become a Partner</h2>
-                    <p className="text-secondary">
-                        We are always looking to expand our network of partners. If you are interested in collaborating with us, please follow these simple steps:
-                    </p>
-                    <ul className="list-unstyled text-secondary">
-                        <li>1. Create an account and go to Dashboard</li>
-                        <li>2. Fill out the partnership application form.</li>
-                        <li>3. Provide details about your organization.</li>
-                        <li>4. Submit your application for review.</li>
-                    </ul>
-                    <p className="text-secondary">
-                        We will get back to you shortly!
-                    </p>
-                </div>
+    // Search filter for active partners only
+    const filteredPartners = partners.filter(partner =>
+        partner.status === 'active' && partner.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
-                <div className="row">
-                    {partners.map(partner => (
-                        <div className="col-lg-4 col-md-6 mb-4" key={partner.id}>
-                            <div className="card h-100 d-flex flex-column">
-                                <img 
-                                    src={partner.logoURL} 
-                                    alt={partner.title} 
-                                    className="card-img-top img-fluid mt-3" 
-                                    style={{ objectFit: 'contain', maxHeight: '200px' }}
-                                />
-                                <div className="card-body flex-grow-1">
-                                    <h5 className="card-title text-primary">{partner.title}</h5>
-                                    <p className="card-text text-secondary" dangerouslySetInnerHTML={{ __html: partner.groupDescription }} />
-                                </div>
-                                <div className="card-footer d-flex justify-content-between align-items-center">
-                                    {partner.websiteLink ? (
-                                        <a 
-                                            href={partner.websiteLink} 
-                                            target="_blank" 
-                                            rel="noopener noreferrer" 
-                                            className="btn btn-primary"
-                                            style={{ flexGrow: 1 }}
-                                        >
-                                            Visit Website
-                                        </a>
-                                    ) : (
-                                        <p className="text-muted mb-0" style={{ flexGrow: 1 }}>Organization website not available</p>
-                                    )}
-                                    {currentUser?.isAdmin && (
-                                        <button 
-                                            onClick={() => handleDelete(partner.id)} 
-                                            className="btn btn-danger"
-                                            style={{ marginLeft: '10px' }}
-                                        >
-                                            Delete
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </div>
+    // Pagination Logic
+    const indexOfLastPartner = currentPage * partnersPerPage;
+    const indexOfFirstPartner = indexOfLastPartner - partnersPerPage;
+    const currentPartners = filteredPartners.slice(indexOfFirstPartner, indexOfLastPartner);
+
+    return (
+        <Box className="partners-page container my-5">
+            {loading ? (
+                <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+                    <CircularProgress />
+                </Box>
+            ) : (
+                <Box sx={{ backgroundColor: '#f9f9f9', padding: '2rem', borderRadius: '8px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)' }}>
+                    <Typography variant="h4" align="center" color="primary" gutterBottom>
+                        Our Partners
+                    </Typography>
+
+                    <TextField
+                        label="Search Partners"
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        sx={{ backgroundColor: '#fff', borderRadius: '4px' }}
+                    />
+
+                    <Grid container spacing={3}>
+                        {currentPartners.map(partner => (
+                            <Grid item xs={12} sm={6} md={4} key={partner.id}>
+                                <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)' }}>
+                                    <CardMedia
+                                        component="img"
+                                        image={partner.logoURL}
+                                        alt={partner.title}
+                                        sx={{ objectFit: 'contain', maxHeight: '200px', padding: '1rem' }}
+                                    />
+                                    <CardContent sx={{ flexGrow: 1 }}>
+                                        <Typography variant="h5" color="primary">{partner.title}</Typography>
+                                        <Typography color="textSecondary" dangerouslySetInnerHTML={{ __html: partner.groupDescription }} />
+                                    </CardContent>
+                                    <Box display="flex" justifyContent="space-between" alignItems="center" padding="1rem">
+                                        {partner.websiteLink ? (
+                                            <Button 
+                                                variant="contained" 
+                                                color="primary" 
+                                                href={partner.websiteLink} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                sx={{ flexGrow: 1, marginRight: '10px' }}
+                                            >
+                                                Visit Website
+                                            </Button>
+                                        ) : (
+                                            <Typography color="textSecondary" variant="body2">Website not available</Typography>
+                                        )}
+                                        {currentUser?.isAdmin && (
+                                            <Button 
+                                                variant="outlined" 
+                                                color="error" 
+                                                onClick={() => handleDelete(partner.id)}
+                                            >
+                                                Delete
+                                            </Button>
+                                        )}
+                                    </Box>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
+
+                    {/* Pagination Component */}
+                    <Pagination 
+                        count={Math.ceil(filteredPartners.length / partnersPerPage)} 
+                        page={currentPage} 
+                        onChange={(event, value) => setCurrentPage(value)} 
+                        sx={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }} 
+                    />
+                </Box>
+            )}
+        </Box>
     );
 }
 

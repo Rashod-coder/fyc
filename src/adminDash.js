@@ -152,38 +152,6 @@ const AdminDash = () => {
           </TableContainer>
         )}
       </Card>
-
-      {/* Manage Current Partners */}
-      <Card sx={{ padding: '20px', marginBottom: '20px', borderRadius: '15px', backgroundColor: 'white' }}>
-        <Typography variant="h4" sx={{ marginBottom: '20px', color: '#1976d2' }}>Manage Current Partners</Typography>
-        {currentPartners.length === 0 ? (
-          <Typography>No Current Partners</Typography>
-        ) : (
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Partner Name</TableCell>
-                  <TableCell>Action</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {currentPartners.map((partner) => (
-                  <TableRow key={partner.id}>
-                    <TableCell>{partner.title}</TableCell>
-                    <TableCell>
-                      <IconButton onClick={() => handleDeletePartner(partner.title)} color="error">
-                        <Delete />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </Card>
-
       {/* Role Change Requests */}
       <Card sx={{ padding: '20px', marginBottom: '20px', borderRadius: '15px', backgroundColor: 'white' }}>
         <Typography variant="h4" sx={{ marginBottom: '20px', color: '#1976d2' }}>Team Verification Requests</Typography>
