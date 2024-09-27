@@ -7,6 +7,7 @@ import Epartner from './editPartner';
 import VerifyRoleRequest from './Verify';
 import GuestDashboard from './guestDash';
 import AdminDash from './adminDash';
+import Events from './Events';
 import { Box, Typography, Button, CircularProgress, Avatar, Card, Grid, Paper } from '@mui/material';
 import { AccountCircle, Star } from '@mui/icons-material';
 
@@ -32,6 +33,9 @@ function Dashboard() {
     };
     const handleRedirect = () => {
         navigate('/members'); // Redirect to members page
+    };
+    const handleEventRedirect = () => {
+        navigate('/manage-events'); // Redirect to members page
     };
 
     useEffect(() => {
@@ -150,9 +154,9 @@ function Dashboard() {
           color: '#fff', 
           '&:hover': { backgroundColor: '#333' } 
         }} 
-        onClick={handleRedirect} // Redirect function
+        onClick={handleEventRedirect} // Redirect function
       >
-        Make an Announcement
+        Create Event
       </Button>
     </Grid>
     <Grid item xs={12} sm={4} display="flex" justifyContent="center">

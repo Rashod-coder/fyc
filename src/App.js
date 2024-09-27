@@ -10,6 +10,7 @@ import Settings from './Settings';
 import PartnersPage from './Partners';
 import TeamsPage from './Team';
 import MembersPage from './Members';
+import Events from './Events'
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
        <Route path="partners" element={<PartnersPage />} />
        <Route path = 'team' element={<TeamsPage/>} />
        <Route path = 'members' element={<MembersPage/>} />
+       <Route path = 'manage-events' element={<Events/>} />
       </Routes>
    </Router>
   );
