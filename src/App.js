@@ -11,6 +11,8 @@ import PartnersPage from './Partners';
 import TeamsPage from './Team';
 import MembersPage from './Members';
 import Events from './Events'
+import DisplayEvents from './displayEvents';
+import ViewEvent from './viewEvent';
 
 
 function App() {
@@ -27,6 +29,9 @@ function App() {
        <Route path = 'team' element={<TeamsPage/>} />
        <Route path = 'members' element={<MembersPage/>} />
        <Route path = 'manage-events' element={<Events/>} />
+       <Route path = 'events' element={<DisplayEvents/>} />
+       <Route path="/events/:id" element={<ViewEvent />} />
+
       </Routes>
    </Router>
   );

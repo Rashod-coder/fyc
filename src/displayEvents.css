@@ -1,0 +1,10 @@
+/* displayEvents.css */
+
+.event-card {
+    transition: transform 0.3s, box-shadow 0.3s; /* Smooth transition */
+}
+
+.event-card:hover {
+    transform: translateY(-5px); /* Lift the card on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Increased shadow on hover */
+}

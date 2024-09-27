@@ -78,6 +78,9 @@ function Navbar() {
                 <a className="nav-link text-light text-center" style={{ fontSize: '25px', fontFamily: 'Quicksand' }} href="/partners">Partners</a>
               </li>
               <li className="nav-item">
+                <a className="nav-link text-light text-center" style={{ fontSize: '25px', fontFamily: 'Quicksand' }} href="/events">Events</a>
+              </li>
+              <li className="nav-item">
                 <IconButton
                   aria-controls={anchorEl ? 'account-menu' : undefined}
                   aria-haspopup="true"
