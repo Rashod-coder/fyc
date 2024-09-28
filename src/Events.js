@@ -23,7 +23,10 @@ import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { addDoc, collection, getDocs, deleteDoc, updateDoc, doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { db, storage, auth } from './Firebase/Firebase';
+import { useNavigate } from 'react-router-dom';
 import ManageEvents from './manageEvents';
+
+
 
 function Events() {
     const [activeStep, setActiveStep] = useState(0);
@@ -42,6 +45,7 @@ function Events() {
         cost: '',
     });
     const [eventFile, setEventFile] = useState(null);
+    const navigate = useNavigate();
     const [coverFile, setCoverFile] = useState(null);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [showProgress, setShowProgress] = useState(false);
@@ -53,17 +57,45 @@ function Events() {
     const [loadingEvents, setLoadingEvents] = useState(true);
     const [currentUser, setCurrentUser] = useState(null);
     const [uploading, setUploading] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    
 
     const steps = ['Announce Event', 'Upload Image',  'Confirm and Submit'];
 
     useEffect(() => {
-        onAuthStateChanged(auth, async (user) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
                 setCurrentUser(user);
-                fetchEvents();
+                // Fetch user data to check if they are an admin
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (userDoc.exists() && userDoc.data().accountLevel === 'admin') {
+                    setIsAdmin(true);
+                } else {
+                    setIsAdmin(false);
+                    navigate('/login'); // Navigate to login if not an admin
+                }
+            } else {
+                navigate('/login'); // Navigate to login if user is not authenticated
             }
         });
-    }, []);
+
+        // Clean up the subscription on unmount
+        return () => unsubscribe();
+    }, [navigate]);
+
+    if (!isAdmin) {
+        return (
+            <Box p={3}>
+                <Typography variant="h4" gutterBottom>
+                    Access Denied
+                </Typography>
+                <Typography variant="body1">
+                    Only admin users can access this section.
+                </Typography>
+            </Box>
+        );
+    }
 
     const fetchEvents = async () => {
         setLoadingEvents(true);
