@@ -10,6 +10,8 @@ import {
   browserLocalPersistence,
 } from 'firebase/auth';
 import { auth } from './Firebase/Firebase';
+import Cookies from 'js-cookie';
+import { v4 as uuidv4 } from 'uuid'; // Import the uuid function
 
 function Login() {
   const navigate = useNavigate();
@@ -24,9 +26,14 @@ function Login() {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
           if (user) {
             setUser(user);
+            const userId = uuidv4(); // Generate a unique ID
+            Cookies.set('userId', userId, { expires: 7 }); // Set the cookie with the generated ID
+            console.log('Cookie set:', Cookies.get('userId')); // Log the cookie
             navigate('/dashboard'); 
           } else {
             setUser(null);
+            Cookies.remove('userId'); // Remove the cookie when logged out
+            console.log('Cookie removed'); // Log cookie removal
           }
         });
 
