@@ -10,6 +10,7 @@ import AdminDash from './adminDash';
 import Events from './Events';
 import { Box, Typography, Button, CircularProgress, Avatar, Card, Grid, Paper } from '@mui/material';
 import { AccountCircle, Star } from '@mui/icons-material';
+import ManageEvent from './manageEvents'
 
 function Dashboard() {
     const [userName, setUserName] = useState('');
@@ -183,6 +184,9 @@ function Dashboard() {
 
                     <Card sx={{ padding: '1.5rem', marginTop: '1rem', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
                         <AdminDash />
+                    </Card>
+                    <Card sx={{ padding: '1.5rem', marginTop: '1rem', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
+                        <ManageEvent />
                     </Card>
                     
                     
